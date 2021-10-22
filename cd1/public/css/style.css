@@ -1,0 +1,241 @@
+footer {
+    text-align: center;
+    padding:20px;
+    padding-bottom:35px;
+}
+footer .link{
+    color:grey;
+    font-size: 12px;
+    padding-top:20px;
+}
+footer .link a{
+    color:grey;
+    font-size: 12px;
+}
+footer .link .a{
+    color:#363636;
+    font-size:12px;
+}
+footer .cart a:hover{
+    color:rgb(179, 237, 245);
+}
+footer .cart a{
+    color:#65dacb;
+    padding-left:10px;
+}
+.footer-1 .row ul{
+    text-align: center;
+    background:#3f3f3f;
+    color:#65dacb;
+    width:100%;
+    padding:12px;
+}
+.footer-1 .row li {
+    display:inline-block;
+}
+.footer-1 .row a{
+    color:white;
+}
+.footer-1 .row a:hover{
+    color:#65dacb;
+}
+.footer-1 .row img{
+    width:100%;
+    padding-bottom:20px;
+}
+.content1 .p h4{
+    background:#D24171;
+    color:white;
+    font-size: 18px;
+    padding:25px;
+    text-align:center;
+}
+.content2 .p h4{
+    background:lightskyblue;
+    color:white;
+    font-size: 18px;
+    padding:25px;
+    text-align:center;
+}
+.content .row{
+    text-align: center;
+}
+.content .row h4{
+    color:#363636;
+    font-size: 17px;
+    padding-top:10px;
+}
+.content .row p{
+    color:grey;
+    font-size: 11px;
+    padding-top:15px;
+}
+.content .row h5{
+    color:#65dacb;
+    font-size: 20px;
+    line-height: 16px;
+    font-family: unset;
+}
+
+.content .items{
+    padding-top:30px;
+}
+.content .p1 h4{
+    background:#41d2bf;
+    color:white;
+    font-size: 18px;
+    padding:25px;
+}
+.content-1 .logo{
+    padding-top: 40px;
+    padding-bottom: 25px;
+    padding-left:50px;
+}
+.content-1 .logo ul{
+    display:inline-block;
+}
+.content-1 .logo li{
+    display:inline-block;
+    font-size: 14px;
+}
+.content-1 .logo li a i{
+    font-size: 10px;
+}
+.content-1 .logo li a{
+    color:#555555;
+   display:inline-block;
+}
+.content-1 .logo li a:hover{
+    color: #41d2bf;
+}
+
+.content-1 .logo li a-1:hover{
+    color: #41d2bf;
+}
+.content-1 .logo li a-1 {
+    color:#555555;
+    font-size: 20px;
+    padding-left:10px;
+}
+.content-1 .cart i{
+    color: gold;
+    padding-right:2px;
+}
+.content-1 .cart a:hover{
+    color: #41d2bf;
+}
+.content-1 .cart a{
+    color: white;
+    font-size: 17px;
+}
+.content-1 .cart {
+    background:#555555;
+    text-align: center;
+    padding:15px;
+}
+.content-1 .cart-1 a{
+    color: white;
+}
+.content-1 .cart-1 a p{
+    color:#41d2bf;
+}
+.content-1 .cart-1 li{
+    color: #41d2bf;
+}
+.content-1 .cart-1 a:hover{
+    color: #41d2bf;
+}
+.content-1 .cart-1{
+    background:#243238;
+}
+.content-1 .cart-1 ul{
+    padding-top:10px;
+}
+.content-1 .cart-1 li{
+    display: inline-block;
+}
+.content-1 .cart-1 a{
+    text-align:center;
+}
+.content-1 .carousel-inner img {
+    width: 100%;
+}
+.container .name h4 a{
+  color: #00BFFF;
+}
+.container .name h4 a:hover{
+  color: #FF82AB;
+}
+.container .rating a{
+    background:#363636;
+    color: white;
+    font-size: 15px;
+    margin: 0px 52px 60px 52px;
+    border-radius: 5px;
+    margin-top:5px;
+}
+.container .rating a:hover{
+   background:#D24171;
+}
+.container .rating i{
+    color:orange;
+}
+.dropbtn {
+    background-color: white;
+    color:#555555;
+    padding: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  .dropbtn:hover{
+      color: #41d2bf;
+  }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  .dropdown-content a {
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  
+  .dropdown:hover .dropbtn {
+    background-color: white;
+  }
+  
+  .category .dropdown:hover .dropbtn {
+    background-color: #243238;
+  }
+  .category .dropbtn {
+    background-color: #243238;
+    color:white;
+    padding: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  .category .dropbtn:hover{
+    background-color: #243238;
+    color: #41d2bf;
+  }
+  .content-1 .category .dropdown-content a{
+    color:black;
+  }
+  .form-inline button{
+    background:#41d2bf;
+    padding:10px 20px;
+  }
+  
