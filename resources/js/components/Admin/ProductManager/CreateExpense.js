@@ -22,6 +22,7 @@ export default function CreateExpense(props) {
             ...expense,
             [name]: value,
         }));
+        console.table(expense);
     };
 
     const handleOnValid = (event, value) => {
@@ -34,7 +35,7 @@ export default function CreateExpense(props) {
                 Swal.fire("Good job!", "Expense Added Successfully", "success")
                 .then(() => {
                     window.location.reload(false);
-                });   
+                });
             })
             .catch((error) => {
                 Swal.fire({
@@ -44,7 +45,7 @@ export default function CreateExpense(props) {
                     confirmButtonText: "Cool",
                 });
             });
-        
+
     };
 
     const handleOnInvalid = (event, error) => {

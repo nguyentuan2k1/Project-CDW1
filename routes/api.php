@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Session;
 
 
@@ -30,4 +31,5 @@ Route::post('/password',[UserController::class,'PasswordUpdate'])->middleware('a
 Route::get('/logout',[UserController::class,'UserLogout'])->middleware('auth:api');
 
 Route::resource('/product', 'App\Http\Controllers\Api\ProductController');
+Route::resource('/category', 'App\Http\Controllers\CategoryController');
 Route::get('/searchProduct',[ProductController::class,'getSearch'])->name('product.search');

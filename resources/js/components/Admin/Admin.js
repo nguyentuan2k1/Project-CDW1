@@ -1,10 +1,10 @@
 import React from "react";
-import ProductManager from "./ProductManager/ProductManager";
+import Categories from "./CategoriesManager/CategoriesManager";
 
 export default function Admin() {
     return (
         <div className="admin">
-            <ProductManager />
+            <Categories/>
         </div>
     );
 }
