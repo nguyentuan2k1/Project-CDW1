@@ -16,7 +16,7 @@ export default function EditCategories(props) {
     useEffect(() => {
         const fetchData = async () => {
             const result = await axios.get(
-                "http://localhost:8000/api/product/" + props.match.params.id
+                "http://localhost:8000/api/category/" + props.match.params.id
             );
             const { data } = await result;
             setExpense(data);

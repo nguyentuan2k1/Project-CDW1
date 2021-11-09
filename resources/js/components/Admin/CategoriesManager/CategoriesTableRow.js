@@ -21,7 +21,7 @@ export default function CategoriesTableRow(props) {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete("http://localhost:8000/api/product/" + props.obj.id)
+                    .delete("http://localhost:8000/api/category/" + props.obj.id)
                     .then((res) => {
                         Swal.fire(
                             "Good job!",

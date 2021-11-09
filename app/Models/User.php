@@ -6,9 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
-use App\Models\OauthAccessToken;
-
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -20,11 +18,11 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'Username',
+        'username',
         'email',
         'password',
-        'phone',
         'type',
+        'phone',
         'address',
     ];
 
@@ -46,20 +44,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    public function isAdmin()
-    {
-        if($this->type === 1)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public function AauthAcessToken(){
-        return $this->hasMany('App\Models\oauth_token');
-    }
-
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\categories;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class CategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::all();
-        return response()->json($user);
+        $category = categories::all();
+        return response()->json($category);
     }
 
     /**
@@ -36,96 +36,84 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $validate = $request->validate([
-            'username' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
-            //optional if you want this to be required
+        $category = categories::create($request->all());
+        return response()->json([
+            'message' => 'categories created',
+            'category' => $category
         ]);
-        if ($validate) {
-            $user = User::create($request->all());
-            return response()->json([
-                'message' => 'user created',
-                'user' => $user
-            ]);
-        }
     }
 
     /**
      * Display the specified resource.
-     *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User
+     * @param  \App\Models\categories
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
     {
-        $user = User::find($id);
-        if ($user) {
+        $category = categories::find($id);
+        if ($category) {
 
             return response()->json([
-                'message' => 'user found!',
-                'user' => $user,
+                'message' => 'category found!',
+                'category' => $category,
             ]);
         }
         return response()->json([
-            'message' => 'user not found!',
+            'message' => 'category not found!',
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\categories  $categories
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $user = User::find($id);
-        return response()->json($user);
+        $category = categories::find($id);
+        return response()->json($category);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * 
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\categories  $categories
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $item = User::find($id);
-        $item->username = $request->get('username');
-        $item->email = $request->get('email');
-        $item->phone = $request->get('phone');
-        $item->address = $request->get('address');
+        $item = categories::find($id);
+        $item->name = $request->get('name');
+        $item->description = $request->get('description');
+        $item->category_image = $request->get('category_image');
         $item->save();
 
         return response()->json([
-            'message' => 'user updated!',
-            'user' => $item
+            'message' => 'category updated!',
+            'category' => $item
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\categories  $categories
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $item = User::find($id);
-        if ($item) {
+        $item = categories::find($id);
+        if ($item){
             $item->delete();
             return response()->json([
-                'message' => 'user deleted'
+                'message' => 'category deleted'
             ]);
         }
         return response()->json([
-            'message' => 'user not found !!!'
+            'message' => 'category not found !!!'
         ]);
     }
 }

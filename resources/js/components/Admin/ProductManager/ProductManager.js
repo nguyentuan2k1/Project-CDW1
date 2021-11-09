@@ -1,6 +1,13 @@
 import React from "react";
-import { Navbar, NavbarBrand, Nav, Container, Row, Col } from 'reactstrap';
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import "bootstrap/dist/css/bootstrap.css";
+
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+
 import EditExpense from "./EditExpense"
 import ExpensesList from "./ExpensesListing";
 import CreateExpense from "./CreateExpense";
@@ -9,17 +16,17 @@ export default function ProductManager() {
     return (
         <Router>
             <div className="product-manager">
-                <header className="App-header"> 
+                <header className="App-header">
                     <Navbar>
                         <Container>
-                            <NavbarBrand>
+                            <Navbar.Brand>
                                 <Link
                                     to={"/create-expense"}
                                     className="nav-link"
                                 >
                                     Product manager
                                 </Link>
-                            </NavbarBrand>
+                            </Navbar.Brand>
 
                             <Nav className="justify-content-end">
                                 <Nav>

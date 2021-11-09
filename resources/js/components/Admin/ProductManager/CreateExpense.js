@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-import { Button, Row, Col } from "reactstrap";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import axios from "axios";
 import ExpensesList from "./ExpensesListing";
 import Swal from "sweetalert2";
-import { AvForm, AvField } from "availity-reactstrap-validation";
-import { error } from "jquery";
 
 export default function CreateExpense(props) {
     const [expense, setExpense] = useState({
-        product_name: "",
+        name: "",
         description: "",
-        quantity: "",
-        price: "",
-        category_id: "1",
-        product_image: "",
+        amount: "",
     });
 
     const handleChange = (e) => {
@@ -22,137 +20,71 @@ export default function CreateExpense(props) {
             ...expense,
             [name]: value,
         }));
-        console.table(expense);
     };
 
-    const handleOnValid = (event, value) => {
+    const doSubmit = (e) => {
+        e.preventDefault();
         const expenseObject = {
-            ...expense,
+            name: expense.name,
+            amount: expense.amount,
+            description: expense.description,
         };
         axios
-            .post("http://localhost:8000/api/product/", expenseObject)
-            .then((res) => {
-                Swal.fire("Good job!", "Expense Added Successfully", "success")
-                .then(() => {
-                    window.location.reload(false);
-                });
-            })
-            .catch((error) => {
-                Swal.fire({
-                    title: "Error!",
-                    text: "Do you want to continue ?",
-                    icon: "error",
-                    confirmButtonText: "Cool",
-                });
-            });
+            .post("http://localhost:8000/api/expenses/", expenseObject)
+            .then((res) => console.log(res.data));
+        // console.log(`Expense successfully created!`);
+        // console.log(`Name: ${this.state.name}`);
+        // console.log(`Amount: ${this.state.amount}`);
+        // console.log(`Description: ${this.state.description}`);
+        Swal.fire("Good job!", "Expense Added Successfully", "success");
 
-    };
-
-    const handleOnInvalid = (event, error) => {
-        Swal.fire({
-            title: "Error!",
-            text: "Do you want to continue ?",
-            icon: "error",
-            confirmButtonText: "Cool",
-        });
+        setExpense({ name: '', amount: '',description: ''  });
     };
 
     return (
         <div className="form-wrapper">
-            <AvForm
-                onValidSubmit={handleOnValid}
-                onInvalidSubmit={handleOnInvalid}
-            >
+            <Form onSubmit={doSubmit}>
                 <Row>
-                    <Col lg="6" md="6" sm="12">
-                        <AvField
-                            name="product_name"
-                            label="Name"
-                            type="text"
-                            placeholder="Product Name..."
-                            value={expense.product_name}
-                            onChange={handleChange}
-                            validate={{
-                                required: {
-                                    value: true,
-                                    errorMessage: "Please enter product name",
-                                },
-                            }}
-                        />
+                    <Col>
+                        <Form.Group controlId="name">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                name="name"
+                                type="text"
+                                value={expense.name}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
                     </Col>
-                    <Col lg="6" md="6" sm="12">
-                        <AvField
-                            name="category_id"
-                            label="Category"
-                            type="select"
-                            value={expense.category_id}
-                            onChange={handleChange}
-                        >
-                            <option value="1">Category 1</option>
-                            <option value="2">Category 2</option>
-                            <option value="3">Category 3</option>
-                        </AvField>
+
+                    <Col>
+                        <Form.Group controlId="amount">
+                            <Form.Label>Amount</Form.Label>
+                            <Form.Control
+                                name="amount"
+                                type="number"
+                                value={expense.amount}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
                     </Col>
                 </Row>
-                <Row>
-                    <Col lg="4" md="4" sm="12">
-                        <AvField
-                            name="quantity"
-                            label="Quantity"
-                            type="number"
-                            placeholder="Quantity..."
-                            value={expense.quantity}
-                            onChange={handleChange}
-                            validate={{
-                                required: {
-                                    value: true,
-                                    errorMessage: "Please enter product name",
-                                },
-                            }}
-                        />
-                    </Col>
-                    <Col lg="4" md="4" sm="12">
-                        <AvField
-                            name="price"
-                            label="Price"
-                            type="number"
-                            placeholder="Product price $ ..."
-                            value={expense.price}
-                            onChange={handleChange}
-                            validate={{
-                                required: {
-                                    value: true,
-                                    errorMessage: "Please enter product name",
-                                },
-                            }}
-                        />
-                    </Col>
-                    <Col lg="4" md="4" sm="12">
-                        <AvField
-                            name="product_image"
-                            label="Image"
-                            type="file"
-                            value={expense.product_image}
-                            onChange={handleChange}
-                        />
-                    </Col>
-                </Row>
-                <AvField
-                    name="description"
-                    label="Description"
-                    type="textarea"
-                    placeholder="Description ..."
-                    value={expense.description}
-                    onChange={handleChange}
-                />
-                <Button
-                    type="submit"
-                    color="primary"
-                    className="btn-md btn-block"
-                >
-                    SUBMIT
+
+                <Form.Group controlId="description">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                        name="description"
+                        as="textarea"
+                        type="textarea"
+                        value={expense.description}
+                        onChange={handleChange}
+                    />
+                </Form.Group>
+
+                <Button variant="primary" size="lg" block="block" type="submit">
+                    Add Expense
                 </Button>
-            </AvForm>
+            </Form>
             <br></br>
             <br></br>
 

@@ -40,16 +40,7 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        //  Chú ý nếu có api cần cover thì phải để trong guard thì nó mới cover dùm ko thì ăn cám nghe con
-        // Lỗi ở đây là auth['api'] not define đấy
-         'api'=>[
-            'driver' => 'passport',
-            'provider'=>'users',
-             'hash' => false,
-        ],
     ],
-
-
 
     /*
     |--------------------------------------------------------------------------

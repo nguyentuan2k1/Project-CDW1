@@ -8,7 +8,7 @@ export default function CategoriesList(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios("http://localhost:8000/api/product/");
+            const result = await axios("http://localhost:8000/api/category/");
             setExpenses(result.data);
         };
         fetchData();

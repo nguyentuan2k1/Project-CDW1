@@ -27,7 +27,7 @@ export default function CreateCategories(props) {
             ...expense,
         };
         axios
-            .post("http://localhost:8000/api/product/", expenseObject)
+            .post("http://localhost:8000/api/category/", expenseObject)
             .then((res) => {
                 Swal.fire("Good job!", "Expense Added Successfully", "success")
                     .then(() => {
