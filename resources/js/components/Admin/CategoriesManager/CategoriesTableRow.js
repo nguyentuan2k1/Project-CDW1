@@ -45,13 +45,7 @@ export default function CategoriesTableRow(props) {
             <td></td>
             <td>{props.obj.name}</td>
             <td>{props.obj.description}</td>
-            <td>$ {props.obj.categories_image}</td>
-            <td>
-                {subDescripton(props.obj.description)}
-                <Link to={"/edit-categories/" + props.obj.id}>
-                     ...
-                </Link>
-            </td>
+
             <td>
                 <Link
                     className="edit-link"
