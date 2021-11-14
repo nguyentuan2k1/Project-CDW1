@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import "../../../../css/EditCategories.css";
 
 export default function EditCategories(props) {
-    const [expense, setExpense] = useState({
+    const [category, setExpense] = useState({
         name: "",
         description: "",
         category_image: "",
@@ -26,15 +26,15 @@ export default function EditCategories(props) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setExpense((expense) => ({
-            ...expense,
+        setExpense((category) => ({
+            ...category,
             [name]: value,
         }));
     };
 
     const handleOnValid = (event, value) => {
         const expenseObject = {
-            ...expense,
+            ...category,
         };
 
         Swal.fire({
@@ -62,7 +62,7 @@ export default function EditCategories(props) {
 
                 Swal.fire("Saved!", "", "success")
                     .then(() => {
-                        props.history.push(`/edit-expense/${props.match.params.id}`);
+                        props.history.push(`/edit-categories/${props.match.params.id}`);
                     });
             } else if (result.isDenied) {
                 Swal.fire("Changes are not saved", "", "info")
@@ -92,7 +92,7 @@ export default function EditCategories(props) {
                                 name="name"
                                 label="Name"
                                 type="text"
-                                value={expense.name}
+                                value={category.name}
                                 onChange={handleChange}
                                 validate={{
                                     required: {

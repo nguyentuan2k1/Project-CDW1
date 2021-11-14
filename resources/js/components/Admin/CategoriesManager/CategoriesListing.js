@@ -4,7 +4,7 @@ import { Table } from 'reactstrap';
 import CategoriesTableRow from "./CategoriesTableRow";
 
 export default function CategoriesList(props) {
-    const [expenses, setExpenses] = useState([]);
+    const [categories, setExpenses] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -14,7 +14,7 @@ export default function CategoriesList(props) {
         fetchData();
     }, []);
 
-    const DataTable = expenses.map((res, i) => {
+    const DataTable = categories.map((res, i) => {
         return <CategoriesTableRow obj={res} key={i} />;
     });
 

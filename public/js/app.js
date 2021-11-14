@@ -9146,7 +9146,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function CategoriesList(props) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]),
       _useState2 = _slicedToArray(_useState, 2),
-      expenses = _useState2[0],
+      categories = _useState2[0],
       setExpenses = _useState2[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
@@ -9179,7 +9179,7 @@ function CategoriesList(props) {
 
     fetchData();
   }, []);
-  var DataTable = expenses.map(function (res, i) {
+  var DataTable = categories.map(function (res, i) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_CategoriesTableRow__WEBPACK_IMPORTED_MODULE_3__["default"], {
       obj: res
     }, i);
@@ -9329,7 +9329,7 @@ function CategoriesTableRow(props) {
     return temp.substr(0, 92);
   };
 
-  var deleteExpense = function deleteExpense() {
+  var deleteCategories = function deleteCategories() {
     sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -9341,7 +9341,7 @@ function CategoriesTableRow(props) {
     }).then(function (result) {
       if (result.isConfirmed) {
         axios__WEBPACK_IMPORTED_MODULE_1___default()["delete"]("http://localhost:8000/api/category/" + props.obj.id).then(function (res) {
-          sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire("Good job!", "Expense Delete Successfully", "success").then(function () {
+          sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire("Good job!", "Categories Delete Successfully", "success").then(function () {
             window.location.reload(false);
           });
         })["catch"](function (error) {
@@ -9366,7 +9366,7 @@ function CategoriesTableRow(props) {
           children: "Edit"
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(reactstrap__WEBPACK_IMPORTED_MODULE_5__.Button, {
-        onClick: deleteExpense,
+        onClick: deleteCategories,
         className: "btn-sm btn-block",
         color: "danger",
         children: "Delete"
@@ -9433,24 +9433,24 @@ function CreateCategories(props) {
     category_image: ""
   }),
       _useState2 = _slicedToArray(_useState, 2),
-      expense = _useState2[0],
+      category = _useState2[0],
       setExpense = _useState2[1];
 
   var handleChange = function handleChange(e) {
     var _e$target = e.target,
         name = _e$target.name,
         value = _e$target.value;
-    setExpense(function (expense) {
-      return _objectSpread(_objectSpread({}, expense), {}, _defineProperty({}, name, value));
+    setExpense(function (category) {
+      return _objectSpread(_objectSpread({}, category), {}, _defineProperty({}, name, value));
     });
-    console.table(expense);
+    console.table(category);
   };
 
   var handleOnValid = function handleOnValid(event, value) {
-    var expenseObject = _objectSpread({}, expense);
+    var expenseObject = _objectSpread({}, category);
 
     axios__WEBPACK_IMPORTED_MODULE_1___default().post("http://localhost:8000/api/category/", expenseObject).then(function (res) {
-      sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire("Good job!", "Expense Added Successfully", "success").then(function () {
+      sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire("Good job!", "Categories Added Successfully", "success").then(function () {
         window.location.reload(false);
       });
     })["catch"](function (error) {
@@ -9489,7 +9489,7 @@ function CreateCategories(props) {
               label: "Name",
               type: "text",
               placeholder: "Categories Name...",
-              value: expense.name,
+              value: category.name,
               onChange: handleChange,
               validate: {
                 required: {
@@ -9506,7 +9506,7 @@ function CreateCategories(props) {
               name: "categories_image",
               label: "Image",
               type: "file",
-              value: expense.category_image,
+              value: category.category_image,
               onChange: handleChange
             })
           })]
@@ -9515,7 +9515,7 @@ function CreateCategories(props) {
           label: "Description",
           type: "textarea",
           placeholder: "Description ...",
-          value: expense.description,
+          value: category.description,
           onChange: handleChange
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(reactstrap__WEBPACK_IMPORTED_MODULE_7__.Button, {
           type: "submit",
@@ -9593,7 +9593,7 @@ function EditCategories(props) {
     category_image: ""
   }),
       _useState2 = _slicedToArray(_useState, 2),
-      expense = _useState2[0],
+      category = _useState2[0],
       setExpense = _useState2[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
@@ -9638,13 +9638,13 @@ function EditCategories(props) {
     var _e$target = e.target,
         name = _e$target.name,
         value = _e$target.value;
-    setExpense(function (expense) {
-      return _objectSpread(_objectSpread({}, expense), {}, _defineProperty({}, name, value));
+    setExpense(function (category) {
+      return _objectSpread(_objectSpread({}, category), {}, _defineProperty({}, name, value));
     });
   };
 
   var handleOnValid = function handleOnValid(event, value) {
-    var expenseObject = _objectSpread({}, expense);
+    var expenseObject = _objectSpread({}, category);
 
     sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
       title: "Do you want to save the changes?",
@@ -9663,7 +9663,7 @@ function EditCategories(props) {
           });
         });
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire("Saved!", "", "success").then(function () {
-          props.history.push("/edit-expense/".concat(props.match.params.id));
+          props.history.push("/edit-categories/".concat(props.match.params.id));
         });
       } else if (result.isDenied) {
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire("Changes are not saved", "", "info");
@@ -9696,7 +9696,7 @@ function EditCategories(props) {
               name: "name",
               label: "Name",
               type: "text",
-              value: expense.name,
+              value: category.name,
               onChange: handleChange,
               validate: {
                 required: {

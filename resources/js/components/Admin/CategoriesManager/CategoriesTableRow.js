@@ -9,7 +9,7 @@ export default function CategoriesTableRow(props) {
         let temp = txtDesc + "";
         return temp.substr(0, 92);
     }
-    const deleteExpense = () => {
+    const deleteCategories = () => {
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -25,7 +25,7 @@ export default function CategoriesTableRow(props) {
                     .then((res) => {
                         Swal.fire(
                             "Good job!",
-                            "Expense Delete Successfully",
+                            "Categories Delete Successfully",
                             "success"
                         ).then(() => {
                             window.location.reload(false);
@@ -56,7 +56,7 @@ export default function CategoriesTableRow(props) {
                     </Button>
                 </Link>
                 <Button
-                    onClick={deleteExpense}
+                    onClick={deleteCategories}
                     className="btn-sm btn-block"
                     color="danger"
                 >

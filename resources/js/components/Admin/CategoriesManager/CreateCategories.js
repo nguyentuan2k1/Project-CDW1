@@ -7,7 +7,7 @@ import { error } from "jquery";
 import CategoriesList from "./CategoriesListing";
 
 export default function CreateCategories(props) {
-    const [expense, setExpense] = useState({
+    const [category, setExpense] = useState({
         name: "",
         description: "",
         category_image: "",
@@ -15,21 +15,21 @@ export default function CreateCategories(props) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setExpense((expense) => ({
-            ...expense,
+        setExpense((category) => ({
+            ...category,
             [name]: value,
         }));
-        console.table(expense);
+        console.table(category);
     };
 
     const handleOnValid = (event, value) => {
         const expenseObject = {
-            ...expense,
+            ...category,
         };
         axios
             .post("http://localhost:8000/api/category/", expenseObject)
             .then((res) => {
-                Swal.fire("Good job!", "Expense Added Successfully", "success")
+                Swal.fire("Good job!", "Categories Added Successfully", "success")
                     .then(() => {
                         window.location.reload(false);
                     });
@@ -68,7 +68,7 @@ export default function CreateCategories(props) {
                             label="Name"
                             type="text"
                             placeholder="Categories Name..."
-                            value={expense.name}
+                            value={category.name}
                             onChange={handleChange}
                             validate={{
                                 required: {
@@ -83,7 +83,7 @@ export default function CreateCategories(props) {
                             name="categories_image"
                             label="Image"
                             type="file"
-                            value={expense.category_image}
+                            value={category.category_image}
                             onChange={handleChange}
                         />
                     </Col>
@@ -93,7 +93,7 @@ export default function CreateCategories(props) {
                     label="Description"
                     type="textarea"
                     placeholder="Description ..."
-                    value={expense.description}
+                    value={category.description}
                     onChange={handleChange}
                 />
                 <Button
