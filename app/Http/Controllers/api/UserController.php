@@ -4,20 +4,15 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-class UserController extends Controller
+use App\Models\users;
+
+class UserController  extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return User::all();
+        return users::all();
     }
-
-    /**
+      /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -25,7 +20,12 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        return User::create($request->all());
+        $user = users::create($request->all());
+        return response()->json([
+            'message' => 'user created',
+            'user' => $user
+        ]);
+       // return products::create($request->all());
     }
 
     /**
@@ -34,7 +34,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(users $user)
     {
         return $user;
     }
@@ -46,10 +46,22 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        $user->update($request->all());
-        return $user;
+        $user = users::find($id);
+        if ($user) {
+            $user->update($request->all());
+            return response()->json([
+                'message' => 'user updated!',
+                'user' => $user
+            ]);
+        } 
+        return response()->json([
+            'message' => 'user not found !!!'
+        ]);
+      
+        // $product->update($request->all());
+        // return $product;
     }
 
     /**
@@ -58,8 +70,18 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-       return $user->delete();
+        $user = users::find($id);
+        if ($user) {
+            $user->delete();
+            return response()->json([
+                'message' => 'deleted user'
+            ]);
+        } 
+        return response()->json([
+            'message' => 'user not found !!!'
+        ]);
+     //  return $product->delete();
     }
 }
