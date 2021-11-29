@@ -4,21 +4,16 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\products;
+use App\Models\users;
 
-class ProductController extends Controller
+//Duyen Controller
+class UserController  extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return products::all();
+        return users::all();
     }
-
-    /**
+      /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -26,12 +21,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = products::create($request->all());
+        $user = users::create($request->all());
         return response()->json([
-            'message' => 'product created',
-            'product' => $product
+            'message' => 'user created',
+            'user' => $user
         ]);
-       // return products::create($request->all());
+       // return users::create($request->all());
     }
 
     /**
@@ -40,9 +35,9 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(products $product)
+    public function show(users $user)
     {
-        return $product;
+        return $user;
     }
 
     /**
@@ -54,20 +49,20 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = products::find($id);
-        if ($product) {
-            $product->update($request->all());
+        $user = users::find($id);
+        if ($user) {
+            $user->update($request->all());
             return response()->json([
-                'message' => 'product updated!',
-                'product' => $product
+                'message' => 'user updated!',
+                'user' => $user
             ]);
         } 
         return response()->json([
-            'message' => 'product not found !!!'
+            'message' => 'user not found !!!'
         ]);
       
-        // $product->update($request->all());
-        // return $product;
+        // $user->update($request->all());
+        // return $user;
     }
 
     /**
@@ -78,16 +73,16 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = products::find($id);
-        if ($product) {
-            $product->delete();
+        $user = users::find($id);
+        if ($user) {
+            $user->delete();
             return response()->json([
-                'message' => 'product deleted'
+                'message' => 'deleted user'
             ]);
         } 
         return response()->json([
-            'message' => 'product not found !!!'
+            'message' => 'user not found !!!'
         ]);
-     //  return $product->delete();
+     //  return $user->delete();
     }
 }

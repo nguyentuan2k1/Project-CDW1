@@ -4,7 +4,6 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,7 +15,7 @@ use App\Http\Controllers\CategoryController;
 |
 */
 
-Route::get('/', function () {
+Route::get('/{path?}', function () {
     return view('welcome');
 });
 
@@ -29,7 +28,4 @@ Route::get('/password',function (){
 
 Route::resource('/product', 'App\Http\Controllers\ProductController');
 Route::get('/searchProduct',[ProductController::class,'getSearch'])->name('product.search');
-Route::resource('/category', 'App\Http\Controllers\CategoryController');
-Route::get('/searchCategory',[CategoryController::class,'getSearch'])->name('category.search');
-Route::resource('/user', 'App\Http\Controllers\UserController');
-Route::get('/searchUser',[UserController::class,'getSearch'])->name('user.search');
+

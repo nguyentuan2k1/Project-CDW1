@@ -1,36 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\OauthAccessToken;
+use Laravel\Passport\Passport;
+use Laravel\Passport\PersonalAccessTokenFactory;
+use Laravel\Passport\RefreshToken;
+use Laravel\Passport\RefreshTokenRepository;
+use Laravel\Passport\Token;
+use Laravel\Passport\Client as OClient;
+use GuzzleHttp\Client;
+use Laravel\Passport\TokenRepository;
+
+
+
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
+    // Login View
     public  function loginview(){
-        return view('auth.login');
+        return view('');
     }
-
+     // Login
     public  function  login(Request  $request){
         $request->validate([
-            'Username'=>'required|min:6|max:12', // khúc này ngon rồi
-            'password'=>'required|min:6|max:12', // test rồi
+            'Username' => 'required|min:6|max:12', // khúc này ngon rồi
+            'password' => 'required|min:6|max:12', // test rồi
         ]);
         $datax = [
-            'Username'=>$request['Username'],
-            'password'=>$request['password']
+            'Username' => $request['Username'],
+            'password' => $request['password']
         ];
+
+        //Note check username !== db || password !== db
         if (Auth::attempt($datax))
         {
          $user =  User::where('Username',$datax['Username'])->first();
@@ -38,91 +49,154 @@ class UserController extends Controller
             return  response()->json(['token'=> $token],200);
         }
         else{
-            return abort(401);
+            return response(['errors'=> "Not found"]);
         }
-
     }
 
+
+
+
+
+    // Register View
     public  function  registerview(){
 
         return view('auth.register');
     }
 
-    public  function  register(Request  $request){
-        
-    /*$validator = Validator::make($request->all(),[
+
+    // Register
+    public  function  register(Request  $request)
+    {
+        if ($request->phone[0] != '0') {
+            return  response(['error' => 'Phone always start with 0']);
+        } elseif ($request->phone[0] == '0') {
+            $check = $request->phone;
+            for ($i = 0; $i < strlen($check); $i++) {
+                if (ord($check[$i]) < 48 || ord($check[$i]) > 57) {
+                    return  response(['error' => 'Please type is number in phone']);
+                }
+            }
+        }
+    $validator = Validator::make($request->all(),[
         'Username'=>'required|min:6|max:12|unique:users,Username', // khúc này ngon rồi
         'password'=>'required|min:6|max:12', // test rồi
         'email' => 'required|email|unique:users,email', // test luôn rồi
-        'phone'=>'required|integer|digits:10|unique:users,phone', // khúc này test luôn rồi
-    ]);*
-
+        'phone'=>'required|digits:10|unique:users,phone', // khúc này test luôn rồi
+    ]);
 
         if ($validator->fails()){
-            return  response()->json([
-               "status" => 'Sign up Failed'
-            ],500);
-        }*/
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
         $data = [
-          'Username'=>$request['Username'],
-            'email'=>$request['email'],
-            'phone'=>$request['phone'],
-            'password'=>Hash::make( $request['password']),
-            'type'=> 0
+            'Username' => $request['Username'],
+            'email' => $request['email'],
+            'phone' => $request['phone'],
+            'password' => Hash::make($request['password']),
+            'type' => 0,
+            'address' => "",
         ];
         DB::table('users')->insert($data);
         return response()->json([
             'status' => "Sign Up Success"
-        ],200);
+        ], 200);
     }
 
+
+
+     // Get  info user
     public  function  infoview(Request $request){
         $data = Auth::user();
         $datatoClient = [
-          'email'=> $data['email'],
-            'phone'=>$data['phone'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
             'address' => $data['address'],
         ];
-        return response()-> json( $datatoClient);
+        return response()->json($datatoClient);
     }
 
+    // Update Info User
     public  function  infoPost(Request  $request){
-
+        $checkrule = array() ;
         $data = Auth::user();
-        $validator = Validator::make($request->all(),[
-            'email' => 'required|email|unique:users,email', // test luôn rồi
-            'phone'=>'required|integer|digits:10|unique:users,phone', // khúc này test luôn rồi
-        ]);
-        if ($validator->fails()){
-            return response()->json(['status'=>'Update Failed']);
+        /*if ($data['email'] != $request->old_email || $data['phone'] != $request->old_phone
+            || $data ['address'] != $request->old_address){
+            return response(['error' => 'Not Update Success']);
+        }*/
+        $phone = $request->phone;
+        if ($data['email'] != $request->email) {
+            $email = ['email' => 'required|email|unique:users,email'];
+            $checkrule['email'] = $email;
+        }
+        if ($data['phone'] != $phone) {
+            if ($phone[0] != '0') {
+                return  response(['error' => 'Phone always start with 0']);
+            } elseif ($phone[0] == '0') {
+                $check = $phone;
+                for ($i = 0; $i < strlen($check); $i++) {
+                    if (ord($check[$i]) < 48 || ord($check[$i]) > 57) {
+                        return  response(['error' => 'Please type is number in phone']);
+                    }
+                }
+            }
+            $phone = ['phone' => 'required|digits:10|unique:users,phone'];
+            $checkrule['phone'] = $phone;
+        }
+        foreach ($checkrule as $x) {
+            $validator = Validator::make($request->all(), $x);
+            if ($validator->fails()) {
+                return response(['errors' => $validator->errors()->all()], 422);
+            }
         }
         $data['email'] = $request->email;
         $data['phone'] = $request->phone;
+        $data['address'] = $request->address;
         $data->save();
-        return  response()->json(['status'=>'Update Success'],200);
+        return  response()->json(['status' => 'Update Success'], 200);
     }
 
-    public  function  PasswordUpdate(Request  $request){
+    // Update PassWord
+    public  function  PasswordUpdate(Request  $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'new_password' => 'required|min:6|max:12', 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'Update password fail']);
+        }
         $data = Auth::user();
         $old_password = $request->old_password;
-        if (!Hash::check($old_password,$data['password'])){
-            return response()->json(['status'=>'old password is wrong ']);
+        if (!Hash::check($old_password, $data['password'])) {
+            return response()->json(['status' => 'old password is wrong ']);
         }
         $data['password'] = bcrypt($request['new_password']);
         $data->save();
-        return response()->json(['status'=>'Update Success'],200);
+        return response()->json(['status' => 'Update Success', 'password' => $data], 200);
     }
 
-    public function  UserLogout(Request  $request){
+    // Logout
+    public function  UserLogout(Request  $request)
+    {
         if (Auth::check()) {
-            Auth::user()->AauthAcessToken()->delete();
+            $user = Auth::user();
+            Token::where('user_id', $user->id)
+                ->update(['revoked' => true]);
+            return response()->json(['status' => 'logout success'], 200);
         }
     }
 
+/////Viet usercontroller
+
+      /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        $users = User::all();
-        return view('admin.user.index',compact('users'));
+        $user = users::all();
+     
+        return response()->json($user);
     }
 
     /**
@@ -146,33 +220,47 @@ class UserController extends Controller
         $request->validate([
             'Username' => 'required',
             'email' => 'required',
-            'password' => 'required',
             'phone' => 'required',
+            'password' => 'required',
             'type' => 'required',
             'address' => 'required'
         ]);
 
-        $user = new User([
+        $user = new users([
             'Username' => $request->get('Username'),
             'email' => $request->get('email'),
-            'password' => $request->get('password'),
             'phone' => $request->get('phone'),
+            'password' => $request->get('password'),
             'type' => $request->get('type'),
-            'address' => $request->get('address')
+            'address' => $request->get('address'),
         ]);
+
         $user->save();
-        return redirect('/user')->with('success', 'User added.');
+        return response()->json([
+            'message' => 'user created',
+            'users' => $user
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        $users = users::find($id);
+        if ($users) {
+
+            return response()->json([
+                'message' => 'users found!',
+                'users' => $users,
+            ]);
+        }
+        return response()->json([
+            'message' => 'users not found!',
+        ]);
     }
 
     /**
@@ -183,8 +271,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $item = User::find($id);
-        return view('admin.user.edit', compact('item'));
+        $users = users::find($id);
+        return response()->json($users);
     }
 
     /**
@@ -199,22 +287,29 @@ class UserController extends Controller
         $request->validate([
             'Username' => 'required',
             'email' => 'required',
-            'password' => 'required',
             'phone' => 'required',
+            'password' => 'required',
             'type' => 'required',
             'address' => 'required'
         ]);
-      
-        $user = User::find($id);
+
+        //2 Tao Product Model, gan gia tri tu form len cac thuoc tinh cua Product model
+        $user = users::find($id);
         $user->Username = $request->get('Username');
         $user->email = $request->get('email');
-        $user->password = $request->get('password');
         $user->phone = $request->get('phone');
+        $user->password = $request->get('password');
         $user->type = $request->get('type');
         $user->address = $request->get('address');
+       
 
+        //3 Luu
         $user->save();
-        return redirect('/user')->with('success', 'User updated.');
+        
+        return response()->json([
+            'message' => 'user updated!',
+            'users' => $user
+        ]);
     }
 
     /**
@@ -225,15 +320,25 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
-        $user->delete();
-        return redirect('/user')->with('success', 'Deleted.');
+        $user = users::find($id);
+        if ($user) {
+            $user->delete();
+            return response()->json([
+                'message' => 'user deleted'
+            ]);
+        } 
+        return response()->json([
+            'message' => 'user not found !!!'
+        ]);
     }
 
-    public function getSearch(Request $request){
-        $user = User::where('Username','like','%'.$request->keyword.'%')
-                     ->orwhere('address','like','%'.$request->keyword.'%')
-                     ->get();        
-                    return view('admin.user.search', compact('user'));
-    }
+    // public function getSearch(Request $request){
+    //     $user = users::where('Username','like','%'.$request->key.'%')
+    //                         ->orwhere('price','like','%'.$request->key.'%')
+    //                         ->get();
+    //                         return view('admin.product.search', compact('product'));
+    // }
+
+
+   
 }

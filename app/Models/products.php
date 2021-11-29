@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class products extends Model
 {
-    use HasFactory;
 
     protected $fillable = [
         'product_name',
@@ -18,6 +17,7 @@ class products extends Model
         'quantity'
         
     ];
+    
     public function categories()
     {
         return $this->belongsTo('App\Models\categories');
