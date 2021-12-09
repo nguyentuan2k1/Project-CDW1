@@ -134,22 +134,5 @@ class CategoryController extends Controller
             'message' => 'category not found !!!'
         ]);
     }
-    public function getSearch(Request $request){
-        $category = categories::where('name','like','%'.$request->key.'%')->get();
-        if($category){
-            if(empty(count($category))){
-                return response()->json([
-                    'message' => 'category not found!',
-                ]);
-            }
-            else{
-                return response()->json([
-                    'message' => count($category). ' category found!!!',
-                    'item' => $category
-                ]);
-            }
-           
-        }
-        
-    }
+   
 }

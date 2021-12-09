@@ -149,25 +149,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function getSearch(Request $request){
-        $product = products::where('product_name','like','%'.$request->key.'%')
-                            ->orwhere('price','like','%'.$request->key.'%')
-                            ->get();
-                         //   return view('admin.product.search', compact('product'));
-                           if($product){
-                            if(empty(count($product))){
-                                return response()->json([
-                                    'message' => 'product not found!',
-                                ]);
-                            }
-                            else{
-                                return response()->json([
-                                    'message' => count($product). ' product found!!!',
-                                    'item' => $product
-                                ]);
-                            }
-                        }
-                    }
+   
                 
                 }
             
