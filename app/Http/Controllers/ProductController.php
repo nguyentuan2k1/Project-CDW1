@@ -343,7 +343,7 @@ class ProductController extends Controller
         $product = products::where('product_name','like','%'.$request->key.'%')
                             ->orwhere('price','like','%'.$request->key.'%')
                             ->get();
-                         //   return view('admin.product.search', compact('product'));
+                         //   return view('admin.product.search', compact('product')); 1
                            if($product){
                             if(empty(count($product))){
                                 return response()->json([
