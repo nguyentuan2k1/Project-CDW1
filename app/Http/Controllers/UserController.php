@@ -26,8 +26,7 @@ use Laravel\Passport\Token;
 use Laravel\Passport\Client as OClient;
 use GuzzleHttp\Client;
 use Laravel\Passport\TokenRepository;
-use App\Http\Controllers\EncryptId;
-use Illuminate\Http\RedirectResponse;
+
 
 
 // Tuấn User Controller
@@ -221,7 +220,7 @@ class UserController extends Controller
         $users = users::all()->toArray();
         $return = [];
         foreach($users as $item){
-            $item['id'] = EncryptId::DichId($item['id']);
+            $item['id'] = $this->Xulyid($item['id']);
             $return[] = $item;
         }
         return response()->json($return);
@@ -319,49 +318,90 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $list = users::all()->toArray();
+        $return = [];
+        foreach($list as $item){
+            $item['id'] = $this->Xulyid($item['id']);
+            $return[] = $item;
+        }
 
-        $id = EncryptId::DichId($id);
-        $checkrule = array() ;
-        try {
-            $data = User::findOrFail($id);
+        $user_id = $this->DichId($id);
+        $user = users::find($user_id);
 
-        }catch (\Exception $exception){
-            return  response()->json(['error'=>'Not found user']);
-        }
-        /*if ($data['email'] != $request->old_email || $data['phone'] != $request->old_phone
-            || $data ['address'] != $request->old_address){
-            return response(['error' => 'Not Update Success']);
-        }*/
-        $phone = $request->phone;
-        if ($data['email'] != $request->email) {
-            $email = ['email' => 'required|email|unique:users,email'];
-            $checkrule['email'] = $email;
-        }
-        if ($data['phone'] != $phone) {
-            if ($phone[0] != '0') {
-                return  response(['error' => 'Phone always start with 0']);
-            } elseif ($phone[0] == '0') {
-                $check = $phone;
-                for ($i = 0; $i < strlen($check); $i++) {
-                    if (ord($check[$i]) < 48 || ord($check[$i]) > 57) {
-                        return  response(['error' => 'Please type is number in phone']);
-                    }
-                }
+      if($user){
+
+
+        $validator = Validator::make($request->all(),[
+            'Username'=>'required|min:6|',
+            'password'=>'required|min:6|max:12',
+            'email' => 'required|email|',
+            'phone'=>'required|digits:10|',
+        ]);
+
+            if ($validator->fails()){
+                return response(['errors'=>$validator->errors()->all()], 422);
             }
-            $phone = ['phone' => 'required|digits:10|unique:users,phone'];
-            $checkrule['phone'] = $phone;
+
+        $Username; $email; $phone; $type;
+
+
+        if ($user['email'] != $request->old_email){
+            return response(['message' => 'Update failed']);
         }
-        foreach ($checkrule as $x) {
-            $validator = Validator::make($request->all(), $x);
-            if ($validator->fails()) {
-                return response(['errors' => $validator->errors()->all()], 422);
+
+        if($request->type == null){
+            $type = 0;
+        }else{
+            $type = $request->type;
+        }
+
+        //Kiem tra username da co hay chua, co bi trung khong
+            if($request->Username == $list[0]['Username']){
+                return response()->json([
+                    'message' => 'The username has been exits!!!',
+                ]);
+            }else{
+                $Username = $request->Username;
             }
-        }
-        $data['email'] = $request->email;
-        $data['phone'] = $request->phone;
-        $data['address'] = $request->address;
-        $data->save();
-        return  response()->json(['status' => 'Update Success'], 200);
+
+          //Kiem tra email da co hay chua, co bi trung khong
+            if($request->email == $list[0]['email']){
+                return response()->json([
+                    'message' => 'The email has been exits!!!',
+                ]);
+            }else{
+                $email = $request->email;
+            }
+
+              //Kiem tra phone da co hay chua, co bi trung khong
+              if($request->phone == $list[0]['phone']){
+                return response()->json([
+                    'message' => 'The phone has been exits!!!',
+                ]);
+            }else{
+                $phone = $request->phone;
+            }
+
+
+
+           $user->update([
+            $user->Username = $Username,
+            $user->email = $email,
+            $user->phone = $request->get('phone'),
+            $user->password = Hash::make($request['password']),
+            $user->type = $type,
+            $user->address = $request->get('address')
+           ]);
+           $user->save();
+           return response()->json([
+               'message' => 'user updated!',
+               'user' => $user
+           ]);
+       }
+
+       return response()->json([
+           'message' => 'user not found!'
+       ]);
     }
 
     /**
@@ -459,8 +499,6 @@ class UserController extends Controller
                             }
                         }
 
-    public  function ForgetPassword(){
-        return view('email.FillEmailForgotPw');
-    }
+
 
 }
