@@ -29,10 +29,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('/comment', 'App\Http\Controllers\CommentController');
-Route::post('/product/{product_id}/postComment', [CommentController::class,'postComment'])->middleware('auth:api'); //post comment
-Route::put('/editComment/{id}', [CommentController::class,'editComment'])->middleware('auth:api'); //edit comment
-Route::delete('/deleteComment/{id}', [CommentController::class,'deleteComment'])->middleware('auth:api'); //delete comment
+Route::resource('/comment', 'App\Http\Controllers\CommentController')->middleware('auth:api');
+Route::post('/product/{product_id}/postComment', [CommentController::class,'postComment'])->middleware('auth:api');
+Route::put('/editComment/{id}', [CommentController::class,'editComment'])->middleware('auth:api');
+Route::delete('/deleteComment/{id}', [CommentController::class,'deleteComment'])->middleware('auth:api');
 Route::get('/watch-comment-auth',[CommentController::class,'WatchComment'])->middleware('auth:api');// Comment Auth
 Route::get('/watch-comment',[CommentController::class,'WatchCommentNotAuth']);
 Route::post('/login',[UserController::class,'login']); // Api Login
@@ -47,8 +47,8 @@ Route::post('/cart_update',[CartController::class,'Edit'])->middleware('auth:api
 Route::get('/cart_delete',[CartController::class,'Delete'])->middleware('auth:api'); // Api Cart Delete
 Route::get('/productIsInteresting',[ProductisHighLight::class,'getProductisInteresting']); // Api get product is cart much
 Route::get('/productIsBoughtMuch',[ProductisHighLight::class,'getProductIsBoughtMuch']); // Api get product is Bought Much
-Route::resource('/product', 'App\Http\Controllers\Api\ProductController');
-Route::resource('/user', 'App\Http\Controllers\Api\UserController');
+Route::resource('/product', 'App\Http\Controllers\ProductController');
+Route::resource('/user', 'App\Http\Controllers\UserController');
 Route::resource('/category', 'App\Http\Controllers\CategoryController');
 Route::get('/home-page-lastest-product',[HomePageController::class,'GetProductIsLastest']);
 Route::get('/category-is-ramdom',[HomePageController::class,'GetCategoryIsRamdom']);
@@ -56,3 +56,4 @@ Route::get('/category-is-ramdom',[HomePageController::class,'GetCategoryIsRamdom
 Route::get('/searchProduct/{key}',[ProductController::class,'getSearch'])->name('product.search');
 Route::get('/searchCategory/{key}',[CategoryController::class,'getSearch'])->name('category.search');
 Route::get('/searchUser/{key}',[UserController::class,'getSearch'])->name('user.search');
+Route::get('/product_detail',[ProductController::class,'GetProductById']);
