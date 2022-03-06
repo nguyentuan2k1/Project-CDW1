@@ -19,7 +19,7 @@ export default function SlideShow() {
             const result = await axios(
                 "http://localhost:8000/api/category-is-ramdom/"
             );
-            setCategoriesList(result.data);
+            setCategoriesList(result.data.categories);
         };
         fetchData();
     }, []);
@@ -65,7 +65,7 @@ export default function SlideShow() {
                     <p className="slide-show-category-title mb-5">
                         {item.name.toUpperCase()}
                     </p>
-                    <Link className="slide-show-category-link">
+                    <Link className="slide-show-category-link" to={"/categories/"+item.id}>
                         Shop Collections
                     </Link>
                 </div>

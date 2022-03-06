@@ -1,35 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
     Button,
     Row,
     Col,
-    Container,
     TabContent,
     TabPane,
     Nav,
     NavItem,
     NavLink,
-    Card,
-    CardText,
-    Input,
     Modal,
     ModalHeader,
     ModalBody,
     ModalFooter,
 } from "reactstrap";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { AvForm, AvField } from "availity-reactstrap-validation";
 import classnames from "classnames";
-
 import "../../../../css/Review.css";
 import Rating from "./Rating/Rating";
 import { isArray } from "lodash";
-import Rate from "./Rate/Rate";
-export default function Review() {
+export default function Review(props) {
     const [reviews, setReviews] = useState([]);
-    const [products, setProducts] = useState([]);
+    const [product, setProduct] = useState([]);
     const [rating, setRating] = useState(1);
     const [productId, setProductId] = useState(0);
     const [reviewInfo, setReviewInfo] = useState({
@@ -37,24 +30,20 @@ export default function Review() {
     });
     const [activeTab, setActiveTab] = useState("1");
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchData = async () => {
-            const result = await axios("http://localhost:8000/api/product/");
-            setProducts(result.data);
-            setProductId(result.data[0].id);
+            const result = await axios(`${location.origin}/api/product-detail/${props.productId}`);
+            setProduct(result.data.product);
+            setProductId(result.data.product.id);
         };
         fetchData();
     }, []);
-
-    const productSelected = products.map((res, i) => {
-        return <ProductTab obj={res} key={i} />;
-    });
 
     useEffect(() => {
         const fetchData = async () => {
             let tokenStr = localStorage.getItem("loginToken");
             const result = await axios(
-                `http://localhost:8000/api/watch-comment-auth?product_id=${productId}`,
+                `${location.origin}/api/watch-comment-auth?product_id=${props.productId}`,
                 {
                     headers: { Authorization: `Bearer ${tokenStr}` },
                 }
@@ -93,7 +82,7 @@ export default function Review() {
         };
         axios
             .post(
-                `http://localhost:8000/api/product/${productId}/postComment`,
+                `http://localhost:8000/api/product/${27}/postComment`,
                 reviewObj,
                 {
                     headers: { Authorization: `Bearer ${tokenStr}` },
@@ -133,100 +122,84 @@ export default function Review() {
 
     return (
         <div className="review mt-5">
-            <h2 className="review-title">REVIEWS</h2>
-            <Container>
-                <div>
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({
-                                    active: activeTab === "1",
-                                })}
-                                onClick={() => {
-                                    toggle("1");
+            <div className="container-fluid">
+                <Nav tabs>
+                    <NavItem>
+                        <NavLink 
+                            className= {classnames({
+                                active : activeTab === "1",
+                            })}
+                            onClick={() => {
+                                toggle("1");
+                            }}
+                        >
+                            Description
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({
+                                active: activeTab === "2",
+                            })}
+                            onClick={() => {
+                                toggle("2");
+                            }}
+                        >
+                            Reviews
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({
+                                active: activeTab === "3",
+                            })}
+                            onClick={() => {
+                                toggle("3");
+                            }}
+                        >
+                            Form Review
+                        </NavLink>
+                    </NavItem>
+                </Nav>
+                <TabContent activeTab={activeTab} className="container-fluid pt-2">
+                    <TabPane tabId="1" id="productDesc">
+                        {product.description}
+                    </TabPane>
+                    <TabPane tabId="2">
+                        <div className="review-content">{renderReviews}</div>
+                    </TabPane>
+                    <TabPane tabId="3">
+                        <Rating rating={rating} setRating={setRating} />
+                        <AvForm
+                            onValidSubmit={handleOnValid}
+                            onInvalidSubmit={handleOnInvalid}
+                        >
+                            <AvField
+                                name="content"
+                                id="reviewContent"
+                                type="textarea"
+                                placeholder="Write your reviews here"
+                                value={reviewInfo.content}
+                                onChange={handleChange}
+                                validate={{
+                                    required: {
+                                        value: true,
+                                        errorMessage:
+                                            "Please enter your review",
+                                    },
                                 }}
+                            />
+                            <Button
+                                type="submit"
+                                className="btn-md btn-block btn-animation" 
                             >
-                                Reviews
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({
-                                    active: activeTab === "2",
-                                })}
-                                onClick={() => {
-                                    toggle("2");
-                                }}
-                            >
-                                Form Review
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
-                    <TabContent activeTab={activeTab}>
-                        <TabPane tabId="1">
-                            <Input
-                                type="select"
-                                name="product_id"
-                                id="productId"
-                                value={productId.product_id}
-                                onChange={handleSelectChange}
-                            >
-                                {productSelected}
-                            </Input>
-                            <hr />
-                            <div className="review-content">
-                                {renderReviews}
-                            </div>
-                        </TabPane>
-                        <TabPane tabId="2">
-                            <Card body>
-                                <CardText>
-                                    <Rating
-                                        rating={rating}
-                                        setRating={setRating}
-                                    />
-                                    <AvForm
-                                        onValidSubmit={handleOnValid}
-                                        onInvalidSubmit={handleOnInvalid}
-                                    >
-                                        <AvField
-                                            name="content"
-                                            label="Your review"
-                                            type="textarea"
-                                            placeholder="Your review..."
-                                            value={reviewInfo.content}
-                                            onChange={handleChange}
-                                            validate={{
-                                                required: {
-                                                    value: true,
-                                                    errorMessage:
-                                                        "Please enter your review",
-                                                },
-                                            }}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            color="success"
-                                            className="btn-md btn-block"
-                                        >
-                                            Submit
-                                        </Button>
-                                    </AvForm>
-                                </CardText>
-                            </Card>
-                        </TabPane>
-                    </TabContent>
-                </div>
-            </Container>
+                                Submit
+                            </Button>
+                        </AvForm>
+                    </TabPane>
+                </TabContent>
+            </div>
         </div>
-    );
-}
-
-function ProductTab(props) {
-    return (
-        <option value={props.obj.id} key={props.obj.id}>
-            {props.obj.product_name}
-        </option>
     );
 }
 
@@ -287,7 +260,7 @@ function ReviewContent(props) {
                                         text: "Do you want to continue ?",
                                         icon: "error",
                                         confirmButtonText: "Cool",
-                                    })
+                                    });
                                 });
                         }
                     });
@@ -309,8 +282,11 @@ function ReviewContent(props) {
 
     const checkOldReviewData = (reviewData, oldReviewData, rating) => {
         let flag = true;
-        if ( reviewData.content === oldReviewData.content
-            && rating === oldReviewData.rate) flag = false;
+        if (
+            reviewData.content === oldReviewData.content &&
+            rating === oldReviewData.rate
+        )
+            flag = false;
         return flag;
     };
 
@@ -430,14 +406,14 @@ function ReviewContent(props) {
                             name="content"
                             label="Your review"
                             type="textarea"
-                            placeholder="Your review..."
+                            placeholder="Write your reviews heres"
                             value={reviewInfo.content}
                             onChange={handleChange}
                             validate={{
                                 required: {
                                     value: true,
                                     errorMessage: "Please enter your review",
-                                },
+                                },  
                             }}
                         />
                         <Button
@@ -458,14 +434,20 @@ function ReviewContent(props) {
 
             <Row>
                 <Col lg={11}>
-                    <p className="review-date">{new Date(props.obj.updated_at).toDateString()}</p>
-                    <h5 className="review-rating">Rate - <span className="review-rating-detail">{props.obj.rate}/5</span></h5>
+                    <p className="review-date">
+                        {new Date(props.obj.updated_at).toDateString()}
+                    </p>
+                    <h5 className="review-rating">
+                        Rate -{" "}
+                        <span className="review-rating-detail">
+                            {props.obj.rate}/5
+                        </span>
+                    </h5>
                     <p className="review-content">{props.obj.content}</p>
                 </Col>
                 <Col lg={1}>
                     <Button
-                        color="outline-success"
-                        className="btn-sm btn-block"
+                        className="btn-sm btn-block btn-animation"
                         onClick={toggle}
                     >
                         Edit
