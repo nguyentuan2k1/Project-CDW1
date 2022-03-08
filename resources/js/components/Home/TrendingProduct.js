@@ -37,6 +37,15 @@ export default function TrendingProduct() {
                 );
                
             })
+            .catch((err) => {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Please login account?",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                });
+                console.log(err);
+            });
     
         }
         return (
