@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useLayoutEffect } from "react";
 import { Button, Row, Col } from "reactstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -19,7 +19,7 @@ export default function EditExpense(props) {
     });
 
     const [expense, setExpense] = useState({
-        id: 0,
+        id: "",
         product_name: "",
         description: "",
         quantity: "",
@@ -53,9 +53,8 @@ export default function EditExpense(props) {
                 "http://localhost:8000/api/product/" + id
             );
             const { data } = await result;
-            console.table(data);
-            setExpense(data);
-            setOldExpense(data);
+            setExpense(data.product[0]);
+            setOldExpense(data.product[0]);
         };
         fetchData();
     }, []);

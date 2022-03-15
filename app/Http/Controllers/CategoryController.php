@@ -71,7 +71,6 @@ class CategoryController extends Controller
      */
     public function show(Request $request,$id)
     {
-
         $cat_id = $this->DichId($id);
         $category = categories::find($cat_id);
         if ($category) {
@@ -230,7 +229,7 @@ class CategoryController extends Controller
         }
     }
 
-    
+
     public function getProductByCategoryId(Request $request)
     {
         $category = categories::where('id', 'like', '%' . $request->key . '%')->get();

@@ -116,7 +116,7 @@ class ProductController extends Controller
     public function show(Request $request, $id) //get item by id
     {
         $pro_id = $this->DichId($id);
-        $product = products::where('id', '=', $id)->get();
+        $product = products::where('id', '=', $pro_id)->get();
         if ($product) {
             return response()->json([
                 'message' => 'product found!',
@@ -163,7 +163,6 @@ class ProductController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'product_name' => 'required',
-
             ]);
 
             if ($validator->fails()) {
@@ -327,8 +326,8 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'No product found',
             ]);
-        } 
- 
+        }
+
         if ($product) {
             if (empty(count($product))) {
                 return response()->json([
@@ -343,7 +342,7 @@ class ProductController extends Controller
         }
     }
     public function GetProductById($productId)
-    {   
+    {
         $id = $productId;
         $pattern_product_id = '/^\d{1,}$/';
         if (!preg_match($pattern_product_id, $id)) {
