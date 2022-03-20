@@ -5,15 +5,20 @@ import ExpensesList from "./ExpensesListing";
 import Swal from "sweetalert2";
 import { AvForm, AvField } from "availity-reactstrap-validation";
 
+
+
+
+
 export default function CreateExpense(props) {
     const [expense, setExpense] = useState({
         product_name: "",
         description: "",
         quantity: "",
         price: "",
-        category_id: "1",
+        category_id: "",
         product_image: null
     });
+    const [image,setImage] = useState('');
     // const refFileInput = useRef('');
 
     const [categoryList, setCategoryList] = useState([]);
@@ -34,6 +39,17 @@ export default function CreateExpense(props) {
         fetchData();
     }, []);
 
+    useEffect(()=>{
+        return ()=>{
+            // console.log(image);
+           image && URL.revokeObjectURL(image);
+           // Câu && giống câu if nếu như nó undefind or false thì nó trả về vế đầu ,
+           // Nếu !false,!underfind -> trả về vế 2 
+           // Viết cái này để tránh rò rĩ bộ nhớ 
+        }
+    },[image])
+
+
     //Create Categories Select options
     const categoriesSelect = categoryList.map((value, index) => {        
         return <option value={value.id}>{value.name}</option>;
@@ -46,8 +62,9 @@ export default function CreateExpense(props) {
             setExpense((expense) => ({
                 ...expense,
                 [name]: e.target.files[0],
-                // filename:e.target.files[0].name
             }));
+            // console.log(URL.createObjectURL(e.target.files[0]));
+            setImage(URL.createObjectURL(e.target.files[0]));
         }
         else{
             console.log("cc vo file");
@@ -151,7 +168,7 @@ export default function CreateExpense(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="quantity"
                             label="Quantity"
@@ -167,7 +184,7 @@ export default function CreateExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="price"
                             label="Price"
@@ -183,7 +200,10 @@ export default function CreateExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                   
+                </Row>
+                 <Row >
+                 <Col lg="6" md="6" sm="6">
                         <AvField
                             name="product_image"
                             label="Image"
@@ -192,8 +212,17 @@ export default function CreateExpense(props) {
                             // value={expense.product_image}
                             onChange={handleChange}
                         />
+                   
+
+                       
                     </Col>
-                </Row>
+                    {image && (
+                        <Col lg="6" md="6" sm="6" >
+                        <img src={image} style={{width:'100%',height:'200px',backgroundSize:'contain',borderRadius:'40px',border:'1px solid #ccc'}} />
+                        </Col>
+                    )}
+
+                 </Row>
                 <AvField
                     name="description"
                     label="Description"
@@ -209,10 +238,7 @@ export default function CreateExpense(props) {
                 >
                     SUBMIT
                 </Button>
-                {console.log("render")}
-                {
-                    console.log(expense)
-                }
+               
             </AvForm>
             <br></br>
             <br></br>
@@ -220,4 +246,8 @@ export default function CreateExpense(props) {
             <ExpensesList> </ExpensesList>
         </div>
     );
+   
 }
+
+
+
