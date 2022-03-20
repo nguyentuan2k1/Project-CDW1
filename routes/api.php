@@ -52,6 +52,7 @@ Route::resource('/product', 'App\Http\Controllers\ProductController');
 Route::resource('/user', 'App\Http\Controllers\UserController');
 Route::resource('/category', 'App\Http\Controllers\CategoryController');
 Route::get('/get-category/{categoryId}',[CategoryController::class,'getCategoryById'])->name('category.searchById');
+Route::post('/product-update/{id}',[ProductController::class,'my_update']); // Thay thế method Put vì truyền ảnh lên ko dc
 /*Route::resource('/product', 'App\Http\Controllers\ProductController')->middleware(['auth:api','role']);
 Route::resource('/user', 'App\Http\Controllers\UserController')->middleware(['auth:api','role']);
 Route::resource('/category', 'App\Http\Controllers\CategoryController')->middleware(['auth:api','role']);*/

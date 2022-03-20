@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Button, Row, Col } from "reactstrap";
 import axios from "axios";
 import ExpensesList from "./ExpensesListing";
@@ -12,8 +12,9 @@ export default function CreateExpense(props) {
         quantity: "",
         price: "",
         category_id: "1",
-        product_image: "",
+        product_image: null
     });
+    // const refFileInput = useRef('');
 
     const [categoryList, setCategoryList] = useState([]);
 
@@ -35,26 +36,46 @@ export default function CreateExpense(props) {
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setExpense((expense) => ({
-            ...expense,
-            [name]: value,
-        }));
+        if(e.target.type == 'file'){
+            // console.log("Di vo file");
+            const { name } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: e.target.files[0],
+                filename:e.target.files[0].name
+            }));
+        }
+        else{
+            console.log("cc vo file");
+            const { name, value } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: value,
+            }));
+        }
     };
 
     const handleOnValid = (event, value) => {
         const expenseObject = {
             ...expense,
         };
+        const formdata = new FormData();
+        formdata.append("product_image",expenseObject.product_image);
+        formdata.append("category_id",expenseObject.category_id);
+        formdata.append("description",expenseObject.description);
+        formdata.append("price",expenseObject.price);
+        formdata.append("product_name",expenseObject.product_name);
+        formdata.append("quantity",expenseObject.quantity);
+
         axios
-            .post("http://localhost:8000/api/product/", expenseObject)
+            .post("http://localhost:8000/api/product/", formdata)
             .then((res) => {
                 Swal.fire(
                     "Good job!",
                     "Expense Added Successfully",
                     "success"
                 ).then(() => {
-                    props.history.push(`/expenses-listing`);
+                    // props.history.push(`/expenses-listing`);
                 });
             })
             .catch((error) => {
@@ -77,7 +98,7 @@ export default function CreateExpense(props) {
     };
     
     return (
-        <div className="form-wrapper">
+        <div className="form-wrapper">  
             <AvForm
                 onValidSubmit={handleOnValid}
                 onInvalidSubmit={handleOnInvalid}
@@ -150,7 +171,7 @@ export default function CreateExpense(props) {
                             label="Image"
                             type="file"
                             accept="image/png, image/gif, image/jpeg"
-                            value={expense.product_image}
+                            // value={expense.product_image}
                             onChange={handleChange}
                         />
                     </Col>
@@ -170,6 +191,10 @@ export default function CreateExpense(props) {
                 >
                     SUBMIT
                 </Button>
+                {console.log("render")}
+                {
+                    console.log(expense)
+                }
             </AvForm>
             <br></br>
             <br></br>

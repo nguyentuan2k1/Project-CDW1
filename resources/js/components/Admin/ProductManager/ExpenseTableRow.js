@@ -3,6 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import { Button } from "reactstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
+//import Aboutus from './storage/1647483226Aboutus.jpg';
 
 export default function ExpenseTableRow(props) {
     const history = useHistory();
@@ -69,7 +70,7 @@ export default function ExpenseTableRow(props) {
 
     return (
         <tr>
-            <td></td>
+            <td><img style={{width:'60px',height:'60px'}} src={props.obj.product_image}/> </td>
             <td>{props.obj.product_name}</td>
             <td>{props.obj.category_id}</td>
             <td>{props.obj.quantity}</td>
