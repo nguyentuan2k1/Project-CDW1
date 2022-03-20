@@ -26,12 +26,16 @@ export default function CreateExpense(props) {
             );
             const { data } = await result;
             setCategoryList(data);
+                setExpense((expense) => ({
+                    ...expense,
+                    category_id: data[0].id 
+                }));
         };
         fetchData();
     }, []);
 
     //Create Categories Select options
-    const categoriesSelect = categoryList.map((value, index) => {
+    const categoriesSelect = categoryList.map((value, index) => {        
         return <option value={value.id}>{value.name}</option>;
     });
 
@@ -42,7 +46,7 @@ export default function CreateExpense(props) {
             setExpense((expense) => ({
                 ...expense,
                 [name]: e.target.files[0],
-                filename:e.target.files[0].name
+                // filename:e.target.files[0].name
             }));
         }
         else{
@@ -75,15 +79,29 @@ export default function CreateExpense(props) {
                     "Expense Added Successfully",
                     "success"
                 ).then(() => {
-                    // props.history.push(`/expenses-listing`);
+                    props.history.push(`/expenses-listing`);
                 });
             })
             .catch((error) => {
+                let error_status = "";
+                
+                for (const [key, value] of Object.entries( error.response.data)) {
+                    // console.log(`${key}: ${value}`);
+                    if(Array.isArray(value)){
+                        value.forEach(element => {
+                            error_status+= element +"\n"
+                        });
+                    }
+                    else{
+                        error_status+=value;
+                    }
+                  }
+
                 Swal.fire({
                     title: "Error!",
-                    text: "Do you want to continue ?",
+                    text: error_status,
                     icon: "error",
-                    confirmButtonText: "Cool",
+                    confirmButtonText: "Try Again",
                 });
             });
     };

@@ -50,40 +50,41 @@ class ProductController extends Controller
 
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|min:2|max:40|unique:products,product_name',
-            'price' => 'required',
-//            'product_image' => 'required',
+            'price' => 'required',  
+           'product_image' => 'required',
             'description' => 'required|min:10|max:200',
             'quantity' => 'required',
             'category_id' => 'required'
         ]);
         if (!$request->hasFile('product_image')) {
-            return "Please Choose File";
+            return  response()->json(['status' => 'Please Choose File'],400);
+
         }
         $image = $request->file('product_image');
         $array_image_type = ['png', 'jpg', 'jpeg', 'svg'];
         if (!in_array($image->getClientOriginalExtension(), $array_image_type)) {
-            return  response()->json(['status' => 'Please Choose type image is png  or jpg  or jpeg or svg']);
+            return  response()->json(['status' => 'Please Choose type image is png  or jpg  or jpeg or svg'],400);
         }
         $checksize = 2097152;
         if ($image->getSize() > $checksize) {
-            return  response()->json(['status' => 'Please file is shorter than 2mb']);
+            return  response()->json(['status' => 'Please file is shorter than 2mb'],400);
         }
          $request->category_id = $this->DichId($request->category_id);
         try {
             categories::findOrFail($request->category_id);
         } catch (\Exception $exception) {
-            return  response()->json(['status' => 'Invalid category - category must is a number in select']);
+            return  response()->json(['status' => 'Invalid category - category must is a number in select'],400);
         }
         if ($validator->fails()) {
-            return  response()->json($validator->messages());
+            return  response()->json($validator->messages(),400);
         }
         $pattern_Integer = '/^\d{1,}$/';
         // xét pattern  quantity + categoryid
         if (!preg_match($pattern_Integer, $request->quantity) || !preg_match($pattern_Integer, $request->category_id)) {
             if (!preg_match($pattern_Integer, $request->quantity)) {
-                return  response()->json(['status' => 'quantity must is positive integers']);
+                return  response()->json(['status' => 'quantity must is positive integers'],400);
             } else {
-                return  response()->json(['status' => 'Category id must is positive integers']);
+                return  response()->json(['status' => 'Category id must is positive integers'],400);
             }
         }
         // Khúc này chú ý nhập giá nhập số  thế này :
@@ -91,7 +92,7 @@ class ProductController extends Controller
         // EX : 123.22(dấu chấm not dấu phẩy ) , 88.32,99.12,642.88,54622.99
         $pattern_price = '/^\d{1,}\.{1,1}\d{2,2}$/';
         if (!preg_match($pattern_price, $request->price)) {
-            return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative ']);
+            return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative '],400);
         }
 
         // dd(storage_path('public/' .'1638934974tong-hop-cac-mau-background-dep-nhat-10070-6.jpg'));
@@ -109,7 +110,7 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
         ]);
         $product->save();
-        return  response()->json(['status' => 'Create Product Success']);
+        return  response()->json(['status' => 'Create Product Success'],200);
     }
 
     /**
