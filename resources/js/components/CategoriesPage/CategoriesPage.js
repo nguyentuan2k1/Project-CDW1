@@ -28,7 +28,7 @@ export default function CategoriesPage() {
         };
         fetchData();
     }, [])
-    
+
     return (
         <div className="categories">
             <div className="categories__header mb-5">

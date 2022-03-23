@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Button, Row, Col } from "reactstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useParams } from "react-router-dom";
 import { AvForm, AvField } from "availity-reactstrap-validation";
 import { Link } from "react-router-dom";
 import "../../../../css/EditExpense.css";
 
 export default function EditExpense(props) {
+    const { id } = useParams();
     const [oldExpense, setOldExpense] = useState({
         product_name: "",
         description: "",
@@ -17,7 +19,7 @@ export default function EditExpense(props) {
     });
 
     const [expense, setExpense] = useState({
-        id: 0,
+        id: "",
         product_name: "",
         description: "",
         quantity: "",
@@ -48,11 +50,11 @@ export default function EditExpense(props) {
     useEffect(() => {
         const fetchData = async () => {
             const result = await axios.get(
-                "http://localhost:8000/api/product/" + props.match.params.id
+                "http://localhost:8000/api/product/" + id
             );
             const { data } = await result;
-            setExpense(data);
-            setOldExpense(data);
+            setExpense(data.product[0]);
+            setOldExpense(data.product[0]);
         };
         fetchData();
     }, []);
@@ -83,7 +85,7 @@ export default function EditExpense(props) {
     const handleOnValid = (event, value) => {
         const fetchData = async () => {
             const result = await axios.get(
-                `http://localhost:8000/api/product/${expense.id}}`
+                `http://localhost:8000/api/product/${props.match.params.id}`
             );
             const { data } = await result;
             return data;
@@ -91,7 +93,8 @@ export default function EditExpense(props) {
 
         fetchData()
             .then((res) => {
-                if (!res.message) {
+                console.log(res.message);
+                if (res.message == 'product found!') {
                     const expenseObject = {
                         ...expense,
                     };
@@ -108,7 +111,7 @@ export default function EditExpense(props) {
                                 axios
                                     .patch(
                                         "http://localhost:8000/api/product/" +
-                                            props.match.params.id,
+                                        props.match.params.id,
                                         expenseObject
                                     )
                                     .catch((error) => {
@@ -116,19 +119,20 @@ export default function EditExpense(props) {
                                             title: "Error!",
                                             text: "Do you want to continue ?",
                                             icon: "error",
-                                            confirmButtonText: "Cool",
+                                            confirmButtonText: "Ok",
                                         });
                                     });
-    
+
                                 Swal.fire("Saved!", "", "success").then(() => {
                                     props.history.push(
                                         `/edit-expense/${props.match.params.id}`
                                     );
+//console.log("Update Thành công nha aaaaa cacasdsa");
                                 });
                             } else if (result.isDenied) {
                                 Swal.fire("Changes are not saved", "", "info");
                             }
-                        }); 
+                        });
                     } else {
                         Swal.fire({
                             title: "Pls type anything you want to update!",
@@ -242,7 +246,7 @@ export default function EditExpense(props) {
                     label="Description"
                     type="textarea"
                     className="text-area-custom"
-                    value={expense.id}
+                    value={expense.description}
                     onChange={handleChange}
                 />
                 <Button

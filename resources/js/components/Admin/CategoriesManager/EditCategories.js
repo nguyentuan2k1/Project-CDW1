@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useLayoutEffect } from "react";
 import { Button, Row, Col } from "reactstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -17,8 +17,8 @@ export default function EditCategories(props) {
             const result = await axios.get(
                 "http://localhost:8000/api/category/" + props.match.params.id
             );
-            const { data } = await result;
-            setExpense(data);
+            const { data } =  result;
+            setExpense(data.category);
         };
         fetchData();
     }, []);
@@ -35,7 +35,6 @@ export default function EditCategories(props) {
         const expenseObject = {
             ...category,
         };
-
         Swal.fire({
             title: "Do you want to save the changes?",
             showDenyButton: true,

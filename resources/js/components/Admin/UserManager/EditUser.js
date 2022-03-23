@@ -22,7 +22,7 @@ export default function EditUser(props) {
                 "http://localhost:8000/api/user/" + props.match.params.id
             );
             const { data } = await result;
-            setUser(data);
+            setUser(data.users);
         };
         fetchData();
     }, []);
@@ -104,7 +104,7 @@ export default function EditUser(props) {
                  <AvField
                     name="old_phone"
                     type="hidden"
-                 
+
                     value={user.old_phone}
                     onChange={handleChange}
                     validate={{

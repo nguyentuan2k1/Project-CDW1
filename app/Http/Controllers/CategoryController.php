@@ -71,7 +71,6 @@ class CategoryController extends Controller
      */
     public function show(Request $request,$id)
     {
-
         $cat_id = $this->DichId($id);
         $category = categories::find($cat_id);
         if ($category) {
@@ -195,20 +194,22 @@ class CategoryController extends Controller
         return $randomString;
     }
 
-    public  function Xulyid($id):String {
+    public  function Xulyid($id): String
+    {
         $dodaichuoi = strlen($id);
         $chuoitruoc = $this->getName(10);
         $chuoisau = $this->getName(22);
-        $handle_id = base64_encode($chuoitruoc.$id. $chuoisau);
+        $handle_id = base64_encode($chuoitruoc . $id . $chuoisau);
         return $handle_id;
     }
 
-    public function DichId($id){
+    public function DichId($id)
+    {
         $id = base64_decode($id);
-        $handleFirst = substr($id,10);
+        $handleFirst = substr($id, 10);
         $idx = "";
-        for ($i=0; $i <strlen($handleFirst)-22 ; $i++) {
-            $idx.=$handleFirst[$i];
+        for ($i = 0; $i < strlen($handleFirst) - 22; $i++) {
+            $idx .= $handleFirst[$i];
         }
         return  $idx;
     }
@@ -230,7 +231,7 @@ class CategoryController extends Controller
         }
     }
 
-    
+
     public function getProductByCategoryId(Request $request)
     {
         $category = categories::where('id', 'like', '%' . $request->key . '%')->get();

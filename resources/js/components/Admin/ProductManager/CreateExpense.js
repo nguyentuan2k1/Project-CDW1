@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Button, Row, Col } from "reactstrap";
 import axios from "axios";
 import ExpensesList from "./ExpensesListing";
 import Swal from "sweetalert2";
 import { AvForm, AvField } from "availity-reactstrap-validation";
+
+
+
+
 
 export default function CreateExpense(props) {
     const [expense, setExpense] = useState({
@@ -11,9 +15,11 @@ export default function CreateExpense(props) {
         description: "",
         quantity: "",
         price: "",
-        category_id: "1",
-        product_image: "",
+        category_id: "",
+        product_image: null
     });
+    const [image,setImage] = useState('');
+    // const refFileInput = useRef('');
 
     const [categoryList, setCategoryList] = useState([]);
 
@@ -25,29 +31,65 @@ export default function CreateExpense(props) {
             );
             const { data } = await result;
             setCategoryList(data);
+                setExpense((expense) => ({
+                    ...expense,
+                    category_id: data[0].id 
+                }));
         };
         fetchData();
     }, []);
 
+    useEffect(()=>{
+        return ()=>{
+            // console.log(image);
+           image && URL.revokeObjectURL(image);
+           // Câu && giống câu if nếu như nó undefind or false thì nó trả về vế đầu ,
+           // Nếu !false,!underfind -> trả về vế 2 
+           // Viết cái này để tránh rò rĩ bộ nhớ 
+        }
+    },[image])
+
+
     //Create Categories Select options
-    const categoriesSelect = categoryList.map((value, index) => {
+    const categoriesSelect = categoryList.map((value, index) => {        
         return <option value={value.id}>{value.name}</option>;
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setExpense((expense) => ({
-            ...expense,
-            [name]: value,
-        }));
+        if(e.target.type == 'file'){
+            // console.log("Di vo file");
+            const { name } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: e.target.files[0],
+            }));
+            // console.log(URL.createObjectURL(e.target.files[0]));
+            setImage(URL.createObjectURL(e.target.files[0]));
+        }
+        else{
+            console.log("cc vo file");
+            const { name, value } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: value,
+            }));
+        }
     };
 
     const handleOnValid = (event, value) => {
         const expenseObject = {
             ...expense,
         };
+        const formdata = new FormData();
+        formdata.append("product_image",expenseObject.product_image);
+        formdata.append("category_id",expenseObject.category_id);
+        formdata.append("description",expenseObject.description);
+        formdata.append("price",expenseObject.price);
+        formdata.append("product_name",expenseObject.product_name);
+        formdata.append("quantity",expenseObject.quantity);
+
         axios
-            .post("http://localhost:8000/api/product/", expenseObject)
+            .post("http://localhost:8000/api/product/", formdata)
             .then((res) => {
                 Swal.fire(
                     "Good job!",
@@ -58,11 +100,25 @@ export default function CreateExpense(props) {
                 });
             })
             .catch((error) => {
+                let error_status = "";
+                
+                for (const [key, value] of Object.entries( error.response.data)) {
+                    // console.log(`${key}: ${value}`);
+                    if(Array.isArray(value)){
+                        value.forEach(element => {
+                            error_status+= element +"\n"
+                        });
+                    }
+                    else{
+                        error_status+=value;
+                    }
+                  }
+
                 Swal.fire({
                     title: "Error!",
-                    text: "Do you want to continue ?",
+                    text: error_status,
                     icon: "error",
-                    confirmButtonText: "Cool",
+                    confirmButtonText: "Try Again",
                 });
             });
     };
@@ -77,7 +133,7 @@ export default function CreateExpense(props) {
     };
     
     return (
-        <div className="form-wrapper">
+        <div className="form-wrapper">  
             <AvForm
                 onValidSubmit={handleOnValid}
                 onInvalidSubmit={handleOnInvalid}
@@ -112,7 +168,7 @@ export default function CreateExpense(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="quantity"
                             label="Quantity"
@@ -128,7 +184,7 @@ export default function CreateExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="price"
                             label="Price"
@@ -144,17 +200,29 @@ export default function CreateExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                   
+                </Row>
+                 <Row >
+                 <Col lg="6" md="6" sm="6">
                         <AvField
                             name="product_image"
                             label="Image"
                             type="file"
                             accept="image/png, image/gif, image/jpeg"
-                            value={expense.product_image}
+                            // value={expense.product_image}
                             onChange={handleChange}
                         />
+                   
+
+                       
                     </Col>
-                </Row>
+                    {image && (
+                        <Col lg="6" md="6" sm="6" >
+                        <img src={image} style={{width:'100%',height:'200px',backgroundSize:'contain',borderRadius:'40px',border:'1px solid #ccc'}} />
+                        </Col>
+                    )}
+
+                 </Row>
                 <AvField
                     name="description"
                     label="Description"
@@ -170,6 +238,7 @@ export default function CreateExpense(props) {
                 >
                     SUBMIT
                 </Button>
+               
             </AvForm>
             <br></br>
             <br></br>
@@ -177,4 +246,8 @@ export default function CreateExpense(props) {
             <ExpensesList> </ExpensesList>
         </div>
     );
+   
 }
+
+
+
