@@ -16,7 +16,10 @@ export default function EditExpense(props) {
         price: "",
         category_id: "",
         product_image: "",
+        category_name: '',
     });
+    const [image,setImage] = useState('');
+
 
     const [expense, setExpense] = useState({
         id: "",
@@ -26,6 +29,7 @@ export default function EditExpense(props) {
         price: "",
         category_id: "",
         product_image: "",
+        category_name: '',
     });
 
     const [categoryList, setCategoryList] = useState([]);
@@ -44,6 +48,10 @@ export default function EditExpense(props) {
 
     //Create Categories Select options
     const categoriesSelect = categoryList.map((value, index) => {
+        // console.log("category id:"+value.id);
+        if(value.name === expense.category_name  ){
+            expense.category_id = value.id
+        }
         return <option value={value.id}>{value.name}</option>;
     });
 
@@ -60,11 +68,25 @@ export default function EditExpense(props) {
     }, []);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setExpense((expense) => ({
-            ...expense,
-            [name]: value,
-        }));
+        if(e.target.type == 'file'){
+            // console.log("Di vo file");
+            const { name } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: e.target.files[0],
+            }));
+            // console.log(URL.createObjectURL(e.target.files[0]));
+            setImage(URL.createObjectURL(e.target.files[0]));
+        }
+        else{
+            // console.log("cc vo file");
+            const { name, value } = e.target; 
+            setExpense((expense) => ({
+                ...expense,
+                [name]: value,
+            }));
+        }
+        console.log(expense);
     };
 
     const checkOldExpense = (expense, oldExpense) => {
@@ -98,7 +120,6 @@ export default function EditExpense(props) {
                     const expenseObject = {
                         ...expense,
                     };
-
                     if (checkOldExpense(expense, oldExpense)) {
                         Swal.fire({
                             title: "Do you want to save the changes?",
@@ -107,12 +128,19 @@ export default function EditExpense(props) {
                             confirmButtonText: "Save",
                             denyButtonText: `Don't save`,
                         }).then((result) => {
+                            const formdata = new FormData();
+                            formdata.append("product_image",expenseObject.product_image);
+                            formdata.append("category_id",expenseObject.category_id);
+                            formdata.append("description",expenseObject.description);
+                            formdata.append("price",expenseObject.price);
+                            formdata.append("product_name",expenseObject.product_name);
+                            formdata.append("quantity",expenseObject.quantity);
                             if (result.isConfirmed) {
                                 axios
-                                    .patch(
-                                        "http://localhost:8000/api/product/" +
+                                    .post(
+                                        "http://localhost:8000/api/product-update/" +
                                         props.match.params.id,
-                                        expenseObject
+                                        formdata
                                     )
                                     .catch((error) => {
                                         Swal.fire({
@@ -127,7 +155,6 @@ export default function EditExpense(props) {
                                     props.history.push(
                                         `/edit-expense/${props.match.params.id}`
                                     );
-//console.log("Update Thành công nha aaaaa cacasdsa");
                                 });
                             } else if (result.isDenied) {
                                 Swal.fire("Changes are not saved", "", "info");
@@ -201,7 +228,7 @@ export default function EditExpense(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="quantity"
                             label="Quantity"
@@ -216,7 +243,7 @@ export default function EditExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="price"
                             label="Price"
@@ -231,7 +258,11 @@ export default function EditExpense(props) {
                             }}
                         />
                     </Col>
-                    <Col lg="4" md="4" sm="12">
+                            
+                </Row>
+                <Row >
+                    
+                <Col lg="6" md="6" sm="12">
                         <AvField
                             name="product_image"
                             label="Image"
@@ -239,6 +270,9 @@ export default function EditExpense(props) {
                             accept="image/png, image/gif, image/jpeg"
                             onChange={handleChange}
                         />
+                    </Col>
+                    <Col lg="6" md="6" sm="12">
+                       <img style={{width:'100%',height:'200px',backgroundSize:'contain',borderRadius:'40px',border:'1px solid #ccc'}} src={"/"+expense.product_image}  />
                     </Col>
                 </Row>
                 <AvField

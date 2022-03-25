@@ -46,11 +46,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|min:2|max:40|unique:products,product_name',
-            'price' => 'required',  
+            'price' => 'required',
            'product_image' => 'required',
             'description' => 'required|min:10|max:200',
             'quantity' => 'required',
@@ -58,7 +56,6 @@ class ProductController extends Controller
         ]);
         if (!$request->hasFile('product_image')) {
             return  response()->json(['status' => 'Please Choose File'],400);
-
         }
         $image = $request->file('product_image');
         $array_image_type = ['png', 'jpg', 'jpeg', 'svg'];
@@ -124,7 +121,12 @@ class ProductController extends Controller
         // dd($request);
         $pro_id = $this->DichId($id);
         $product = products::where('id', '=', $pro_id)->get();
+//        dd($product[0]->category_id);
+
         if ($product) {
+            $category_name = categories::where('id','=',$product[0]->category_id)->get('name');
+            $product[0]->category_name= $category_name[0]->name;
+            unset($product[0]->category_id);
             return response()->json([
                 'message' => 'product found!',
                 'product' => $product,
@@ -217,26 +219,80 @@ class ProductController extends Controller
     public  function my_update(Request $request,$id){
         $pro_id = $this->DichId($id);
         $data_from_query = products::find($pro_id);
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required|min:2|max:40',
+            'price' => 'required',
+           'product_image' => 'required',
+            'description' => 'required|min:10|max:200',
+            'quantity' => 'required',
+            'category_id' => 'required'
+        ]);
+         if (!$request->hasFile('product_image')) {
+             return  response()->json(['status' => 'Please Choose File'],400);
+         }
+        $image = $request->file('product_image');
+        $array_image_type = ['png', 'jpg', 'jpeg', 'svg'];
+        if (!in_array($image->getClientOriginalExtension(), $array_image_type)) {
+            return  response()->json(['status' => 'Please Choose type image is png  or jpg  or jpeg or svg'],400);
+        }
+        $checksize = 2097152;
+        if ($image->getSize() > $checksize) {
+            return  response()->json(['status' => 'Please file is shorter than 2mb'],400);
+        }
+         $request->category_id = $this->DichId($request->category_id);
+        try {
+            categories::findOrFail($request->category_id);
+        } catch (\Exception $exception) {
+            return  response()->json(['status' => 'Invalid category - category must is a number in select'],400);
+        }
+        if ($validator->fails()) {
+            return  response()->json($validator->messages(),400);
+        }
+        $pattern_Integer = '/^\d{1,}$/';
+        // xét pattern  quantity + categoryid
+        if (!preg_match($pattern_Integer, $request->quantity) || !preg_match($pattern_Integer, $request->category_id)) {
+            if (!preg_match($pattern_Integer, $request->quantity)) {
+                return  response()->json(['status' => 'quantity must is positive integers'],400);
+            } else {
+                return  response()->json(['status' => 'Category id must is positive integers'],400);
+            }
+        }
+        // Khúc này chú ý nhập giá nhập số  thế này :
+        // EX : 123.22 bắt buộc có 2 số sau dấu chấm còn số ở trước thì bao nhiêu số cũng dc
+        // EX : 123.22(dấu chấm not dấu phẩy ) , 88.32,99.12,642.88,54622.99
+        $pattern_price = '/^\d{1,}\.{1,1}\d{2,2}$/';
+        if (!preg_match($pattern_price, $request->price)) {
+            return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative '],400);
+        }
+
+        // dd(storage_path('public/' .'1638934974tong-hop-cac-mau-background-dep-nhat-10070-6.jpg'));
+        // Đoạn code trên ko dc xóa , nó là đường link ảnh lưu lên db đó
+        $filename = time() . $image->getClientOriginalName();
+
         if ($request->product_name != $data_from_query->product_name){
             // Kiểm tra dữ liệu đưa vào input với dữ liệu query theo id
             // Nếu 2 dữ liệu ko = nhau -> 1 cái tên mới
             $list = products::where('id','!=',$pro_id)->get(['product_name'])->ToArray();
+
             if (in_array($request->product_name,$list)){
                 return response()->json([
                     'message' => 'The product_name has been exits!!!',
-                ]);
+                ],400);
             }
             else{
+                $duongdan = 'storage/' . $filename; // cái này để lưu lên database
+                $request->file('product_image')->storeAs('public', $filename);
                 $data_from_query->update([
                     $data_from_query->product_name = $request->product_name,
                     $data_from_query->category_id = $request->category_id,
                     $data_from_query->quantity = $request->quantity,
                     $data_from_query->price = $request->price,
-                    $data_from_query->description = $request->description
+                    $data_from_query->description = $request->description,
+                    $data_from_query->product_image = $duongdan
                 ]);
                 return response()->json([
                     'message' => 'Update success',
-                ]);
+                ],200);
             }
         }
         else{
@@ -245,27 +301,28 @@ class ProductController extends Controller
             $pattern_Integer = '/^\d{1,}$/';
             if (!preg_match($pattern_Integer, $request->quantity) || !preg_match($pattern_Integer, $request->category_id)) {
                 if (!preg_match($pattern_Integer, $request->quantity)) {
-                    return  response()->json(['status' => 'quantity must is positive integers']);
+                    return  response()->json(['status' => 'quantity must is positive integers'],400);
                 } else {
-                    return  response()->json(['status' => 'Category id must is positive integers']);
+                    return  response()->json(['status' => 'Category id must is positive integers'],400);
                 }
             }
             $pattern_price = '/^\d{1,}\.{1,1}\d{2,2}$/';
             if (!preg_match($pattern_price, $request->price)) {
-                return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative ']);
-            }
-
-
+                return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative '],400);
+            }        
+            $duongdan = 'storage/' . $filename; // cái này để lưu lên database
+            $request->file('product_image')->storeAs('public', $filename);
             $data_from_query->update([
                 $data_from_query->product_name = $request->product_name,
                 $data_from_query->category_id = $request->category_id,
                 $data_from_query->quantity = $request->quantity,
                 $data_from_query->price = $request->price,
-                $data_from_query->description = $request->description
+                $data_from_query->description = $request->description,
+                $data_from_query->product_image = $duongdan
             ]);
             return response()->json([
                 'message' => 'Update success',
-            ]);
+            ],200);
         }
     }
 
@@ -306,7 +363,7 @@ class ProductController extends Controller
         }
         return response()->json([
             'message' => "can't delete product because have related ingredients."
-        ]);
+        ],400);
     }
 
     private function getName($n)
