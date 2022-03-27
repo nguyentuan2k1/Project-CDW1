@@ -14,9 +14,12 @@ export default function EditCategories(props) {
 
     useEffect(() => {
         const fetchData = async () => {
+            let tokenStr = localStorage.getItem("loginToken");
             const result = await axios.get(
                 "http://localhost:8000/api/category/" + props.match.params.id
-            );
+            ,{
+                headers: { Authorization: `Bearer ${tokenStr}` }
+            });
             const { data } =  result;
             setExpense(data.category);
         };
@@ -43,11 +46,14 @@ export default function EditCategories(props) {
             denyButtonText: `Don't save`,
         }).then((result) => {
             if (result.isConfirmed) {
+                let tokenStr = localStorage.getItem("loginToken");
                 axios
                     .patch(
                         "http://localhost:8000/api/category/" +
                         props.match.params.id,
-                        expenseObject
+                        expenseObject,{
+                            headers: { Authorization: `Bearer ${tokenStr}` }
+                        }
                     )
                     .catch((error) => {
                         Swal.fire({

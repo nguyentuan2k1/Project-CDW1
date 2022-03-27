@@ -118,10 +118,12 @@ class UserController extends Controller
     public  function  infoview(Request $request)
     {
         $data = Auth::user();
+        $role = empty($data->type) ? 'user' : 'admin';
         $datatoClient = [
             'email' => $data['email'],
             'phone' => $data['phone'],
             'address' => $data['address'],
+            'role' => $role
         ];
         return response()->json($datatoClient);
     }

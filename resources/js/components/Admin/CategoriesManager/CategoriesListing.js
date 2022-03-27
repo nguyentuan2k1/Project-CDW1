@@ -8,7 +8,10 @@ export default function CategoriesList(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios("http://localhost:8000/api/category/");
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://localhost:8000/api/category/", {
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             setExpenses(result.data);
         };
         fetchData();

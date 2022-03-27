@@ -21,8 +21,11 @@ export default function CategoriesTableRow(props) {
             confirmButtonText: "Yes, delete it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios
-                    .delete("http://localhost:8000/api/category/" + props.obj.id)
+                    let tokenStr = localStorage.getItem("loginToken");
+                    axios
+                        .delete("http://localhost:8000/api/category/" + props.obj.id,{
+                            headers: { Authorization: `Bearer ${tokenStr}` }
+                        })
                     .then((res) => {
                         Swal.fire(
                             "Good job!",

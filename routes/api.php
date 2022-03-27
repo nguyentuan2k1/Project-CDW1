@@ -48,11 +48,7 @@ Route::post('/cart_update',[CartController::class,'Edit'])->middleware('auth:api
 Route::get('/cart_delete',[CartController::class,'Delete'])->middleware('auth:api'); // Api Cart Delete
 Route::get('/productIsInteresting',[ProductisHighLight::class,'getProductisInteresting']); // Api get product is cart much
 Route::get('/productIsBoughtMuch',[ProductisHighLight::class,'getProductIsBoughtMuch']); // Api get product is Bought Much
-Route::resource('/product', 'App\Http\Controllers\ProductController');
-Route::resource('/user', 'App\Http\Controllers\UserController');
-Route::resource('/category', 'App\Http\Controllers\CategoryController');
 Route::get('/get-category/{categoryId}',[CategoryController::class,'getCategoryById'])->name('category.searchById');
-Route::post('/product-update/{id}',[ProductController::class,'my_update']); // Thay thế method Put vì truyền ảnh lên ko dc
 /*Route::resource('/product', 'App\Http\Controllers\ProductController')->middleware(['auth:api','role']);
 Route::resource('/user', 'App\Http\Controllers\UserController')->middleware(['auth:api','role']);
 Route::resource('/category', 'App\Http\Controllers\CategoryController')->middleware(['auth:api','role']);*/
@@ -66,5 +62,9 @@ Route::get('/categoriesPage/{key}',[CategoryController::class,'getProductByCateg
 Route::get('/categoriesPage/{key}/{filter}',[ProductController::class,'filterProduct'])->name('product.filter');
 Route::get('/product-detail/{productId}',[ProductController::class,'GetProductById'])->name('product.searchProductById');
 Route::middleware(['auth:api','role'])->group(function (){
+    Route::resource('/product', 'App\Http\Controllers\ProductController');
+    Route::resource('/user', 'App\Http\Controllers\UserController');
+    Route::resource('/category', 'App\Http\Controllers\CategoryController');
+    Route::post('/product-update/{id}',[ProductController::class,'my_update']); // Thay thế method Put vì truyền ảnh lên ko dc
 
 });

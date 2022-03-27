@@ -8,7 +8,11 @@ export default function ExpenseList(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios("http://localhost:8000/api/product/");
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://127.0.0.1:8000/api/product/",{
+                headers: { Authorization: `Bearer ${tokenStr}` },
+
+            });
             setExpenses(result.data);
         };
         fetchData();

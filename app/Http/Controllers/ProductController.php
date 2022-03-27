@@ -309,7 +309,7 @@ class ProductController extends Controller
             $pattern_price = '/^\d{1,}\.{1,1}\d{2,2}$/';
             if (!preg_match($pattern_price, $request->price)) {
                 return  response()->json(['status' => 'Price must have 2 number after dot and must is not negative '],400);
-            }        
+            }
             $duongdan = 'storage/' . $filename; // cái này để lưu lên database
             $request->file('product_image')->storeAs('public', $filename);
             $data_from_query->update([
@@ -359,7 +359,7 @@ class ProductController extends Controller
                 return response()->json([
                     'message' => 'product and reviews depended deleted'
                 ]);
-            }
+               }
         }
         return response()->json([
             'message' => "can't delete product because have related ingredients."

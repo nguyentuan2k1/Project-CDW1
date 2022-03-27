@@ -13,8 +13,11 @@ export default function ExpenseTableRow(props) {
     };
     const deleteExpense = () => {
         const fetchData = async () => {
+            let tokenStr = localStorage.getItem("loginToken");
             const result = await axios.get(
-                `http://localhost:8000/api/product/${props.obj.id}}`
+                `http://localhost:8000/api/product/${props.obj.id}}`,{
+                    headers: { Authorization: `Bearer ${tokenStr}` }
+                }
             );
             const { data } = await result;
             return data;
@@ -22,7 +25,8 @@ export default function ExpenseTableRow(props) {
 
         fetchData()
             .then((res) => {
-                if (!res.message) {
+                console.log(res.product.length);
+                if (res.product.length>0) {
                     Swal.fire({
                         title: "Are you sure?",
                         text: "You won't be able to revert this!",
@@ -33,17 +37,20 @@ export default function ExpenseTableRow(props) {
                         confirmButtonText: "Yes, delete it!",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            axios
-                                .delete(
-                                    "http://localhost:8000/api/product/" +
-                                        props.obj.id
-                                )
+                                let tokenStr = localStorage.getItem("loginToken");
+                                axios
+                                    .delete("http://localhost:8000/api/product/" +
+                                    props.obj.id,{
+                                        headers: { Authorization: `Bearer ${tokenStr}` }
+                                    })
+
                                 .then((res) => {
                                     Swal.fire(
                                         "Good job!",
                                         "Expense Delete Successfully",
                                         "success"
                                     ).then(() => {
+                                        
                                         history.push("/create-expense");
                                     });
                                 })
@@ -69,6 +76,7 @@ export default function ExpenseTableRow(props) {
     };
 
     return (
+        
         <tr>
             <td><img style={{width:'60px',height:'60px'}} src={props.obj.product_image}/> </td>
             <td>{props.obj.product_name}</td>

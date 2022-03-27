@@ -118,7 +118,7 @@ export default function TopContent(props) {
                         <div className="img-detail">
                             <img
                                 className="img-fluid"
-                                src={productInfo.product_image}
+                                src={"/"+productInfo.product_image}
                                 width="100%"
                             />
                         </div>

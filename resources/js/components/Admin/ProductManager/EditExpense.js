@@ -18,7 +18,7 @@ export default function EditExpense(props) {
         product_image: "",
         category_name: '',
     });
-    const [image,setImage] = useState('');
+    const [image, setImage] = useState('');
 
 
     const [expense, setExpense] = useState({
@@ -37,9 +37,10 @@ export default function EditExpense(props) {
     //Get categories list
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios.get(
-                "http://localhost:8000/api/category/"
-            );
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://localhost:8000/api/category/", {
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             const { data } = await result;
             setCategoryList(data);
         };
@@ -49,7 +50,7 @@ export default function EditExpense(props) {
     //Create Categories Select options
     const categoriesSelect = categoryList.map((value, index) => {
         // console.log("category id:"+value.id);
-        if(value.name === expense.category_name  ){
+        if (value.name === expense.category_name) {
             expense.category_id = value.id
         }
         return <option value={value.id}>{value.name}</option>;
@@ -57,10 +58,12 @@ export default function EditExpense(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios.get(
-                "http://localhost:8000/api/product/" + id
-            );
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://localhost:8000/api/product/" + id, {
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             const { data } = await result;
+            setImage(data.product[0].product_image);
             setExpense(data.product[0]);
             setOldExpense(data.product[0]);
         };
@@ -68,9 +71,9 @@ export default function EditExpense(props) {
     }, []);
 
     const handleChange = (e) => {
-        if(e.target.type == 'file'){
+        if (e.target.type == 'file') {
             // console.log("Di vo file");
-            const { name } = e.target; 
+            const { name } = e.target;
             setExpense((expense) => ({
                 ...expense,
                 [name]: e.target.files[0],
@@ -78,15 +81,14 @@ export default function EditExpense(props) {
             // console.log(URL.createObjectURL(e.target.files[0]));
             setImage(URL.createObjectURL(e.target.files[0]));
         }
-        else{
+        else {
             // console.log("cc vo file");
-            const { name, value } = e.target; 
+            const { name, value } = e.target;
             setExpense((expense) => ({
                 ...expense,
                 [name]: value,
             }));
         }
-        console.log(expense);
     };
 
     const checkOldExpense = (expense, oldExpense) => {
@@ -106,9 +108,11 @@ export default function EditExpense(props) {
 
     const handleOnValid = (event, value) => {
         const fetchData = async () => {
-            const result = await axios.get(
-                `http://localhost:8000/api/product/${props.match.params.id}`
-            );
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios(`http://localhost:8000/api/product/${props.match.params.id}`
+                , {
+                    headers: { Authorization: `Bearer ${tokenStr}` },
+                });
             const { data } = await result;
             return data;
         };
@@ -129,18 +133,21 @@ export default function EditExpense(props) {
                             denyButtonText: `Don't save`,
                         }).then((result) => {
                             const formdata = new FormData();
-                            formdata.append("product_image",expenseObject.product_image);
-                            formdata.append("category_id",expenseObject.category_id);
-                            formdata.append("description",expenseObject.description);
-                            formdata.append("price",expenseObject.price);
-                            formdata.append("product_name",expenseObject.product_name);
-                            formdata.append("quantity",expenseObject.quantity);
+                            formdata.append("product_image", expenseObject.product_image);
+                            formdata.append("category_id", expenseObject.category_id);
+                            formdata.append("description", expenseObject.description);
+                            formdata.append("price", expenseObject.price);
+                            formdata.append("product_name", expenseObject.product_name);
+                            formdata.append("quantity", expenseObject.quantity);
                             if (result.isConfirmed) {
+                                let tokenStr = localStorage.getItem("loginToken");
                                 axios
                                     .post(
                                         "http://localhost:8000/api/product-update/" +
                                         props.match.params.id,
-                                        formdata
+                                        formdata,{
+                                            headers: { Authorization: `Bearer ${tokenStr}` },
+                                        }
                                     )
                                     .catch((error) => {
                                         Swal.fire({
@@ -258,11 +265,11 @@ export default function EditExpense(props) {
                             }}
                         />
                     </Col>
-                            
+
                 </Row>
                 <Row >
-                    
-                <Col lg="6" md="6" sm="12">
+
+                    <Col lg="6" md="6" sm="12">
                         <AvField
                             name="product_image"
                             label="Image"
@@ -272,7 +279,7 @@ export default function EditExpense(props) {
                         />
                     </Col>
                     <Col lg="6" md="6" sm="12">
-                       <img style={{width:'100%',height:'200px',backgroundSize:'contain',borderRadius:'40px',border:'1px solid #ccc'}} src={"/"+expense.product_image}  />
+                    {image &&  <ImagePreview  product_image={image} /> }  
                     </Col>
                 </Row>
                 <AvField
@@ -302,4 +309,16 @@ export default function EditExpense(props) {
             </AvForm>
         </div>
     );
+}
+
+function ImagePreview(props){
+    const blod_detect = props.product_image[0]+props.product_image[1]+props.product_image[2]+props.product_image[3];
+    if(blod_detect == 'blob'){
+        return  <img style={{ width: '100%', height: '200px', backgroundSize: 'contain', borderRadius: '40px', border: '1px solid #ccc' }} src={props.product_image} />
+    }
+    else{
+        return  <img style={{ width: '100%', height: '200px', backgroundSize: 'contain', borderRadius: '40px', border: '1px solid #ccc' }} src={"/" + props.product_image} />
+    }
+
+    
 }

@@ -26,9 +26,10 @@ export default function CreateExpense(props) {
     //Get categories list
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios.get(
-                "http://localhost:8000/api/category/"
-            );
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://localhost:8000/api/category/",{
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             const { data } = await result;
             setCategoryList(data);
                 setExpense((expense) => ({
@@ -88,8 +89,11 @@ export default function CreateExpense(props) {
         formdata.append("product_name",expenseObject.product_name);
         formdata.append("quantity",expenseObject.quantity);
 
+        let tokenStr = localStorage.getItem("loginToken");
         axios
-            .post("http://localhost:8000/api/product/", formdata)
+            .post("http://localhost:8000/api/product/", formdata, {
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            })
             .then((res) => {
                 Swal.fire(
                     "Good job!",
@@ -211,10 +215,7 @@ export default function CreateExpense(props) {
                             accept="image/png, image/gif, image/jpeg"
                             // value={expense.product_image}
                             onChange={handleChange}
-                        />
-                   
-
-                       
+                        />         
                     </Col>
                     {image && (
                         <Col lg="6" md="6" sm="6" >

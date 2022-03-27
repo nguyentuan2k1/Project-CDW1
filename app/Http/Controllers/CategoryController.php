@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\categories;
 use App\Models\products;
 
+use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\Boolean;
 use function PHPUnit\Framework\isEmpty;
 
 use Illuminate\Support\Facades\Validator;
@@ -105,55 +107,86 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $list = categories::all()->toArray();
-        $return = [];
-        foreach($list as $item){
-            $item['id'] = $this->Xulyid($item['id']);
-            $return[] = $item;
+//        $list = categories::all()->toArray();
+//        $return = [];
+//        foreach($list as $item){
+//            $item['id'] = $this->Xulyid($item['id']);
+//            $return[] = $item;
+//        }
+//
+//      $cat_id = $this->DichId($id);
+//        return $cat_id;
+//      $category = categories::find($cat_id);
+//
+//
+//      if($category){
+//      $validator = Validator::make($request->all(),[
+//        'name'=>'required',
+//    ]);
+//
+//        if ($validator->fails()){
+//            return response(['errors'=>$validator->errors()->all()], 422);
+//        }
+//
+//        $cat_name;
+//
+//        //Kiem tra name da co hay chua, co bi trung khong
+//        if($request->name == $list[0]['name']){
+//            return response()->json([
+//                'message' => 'The name has been exits!!!',
+//            ]);
+//        }else{
+//            $cat_name = $request->name;
+//        }
+//
+//        $category->update([
+//        $category->name = $cat_name,
+//        // $category->image = $request->get('image');
+//        ]);
+//
+//
+//        $category->save();
+//        return response()->json([
+//            'message' => 'category updated!',
+//            'category' => $category
+//        ]);
+//
+//      }
+//
+//        return response()->json([
+//            'message' => 'category not found !!!'
+//        ]);
+//            dd("abcxyz");
+              $cat_id = $this->DichId($id);
+              $data_cate = categories::find($cat_id);
+              if ($data_cate->name == $request->name){
+                  // Trùng tên -> update cái khác
+                  $data_cate->image = $request->image;
+                  $data_cate->description = $request->description;
+                  $data_cate->save();
+                  return  response()->json(['status'=>'Update Successful'],200);
+              }
+              else{
+                  // Khác tên -> có update tên -> tiến hành check
+                  $list = categories::where('id','!=',$data_cate->id)->get(['name'])->ToArray();
+                    $check = false;
+                  foreach($list as $cate_name) {
+                        if ($cate_name['name'] == $request->name){
+                            $check = true;
+                            break;
+                        }
+                  }
+                  if ($check){
+                      return  response()->json(['status'=>'Your Category name is taken'],400);
+                  }
+                     $data_cate->name = $request->name;
+                     $data_cate->image = $request->image;
+                      $data_cate->description = $request->description;
+                  $data_cate->save();
+                  return  response()->json(['status'=>'Update Successful'],200);
+
+                }
         }
-
-      $cat_id = $this->DichId($id);
-      $category = categories::find($cat_id);
-
-
-      if($category){
-      $validator = Validator::make($request->all(),[
-        'name'=>'required',
-    ]);
-
-        if ($validator->fails()){
-            return response(['errors'=>$validator->errors()->all()], 422);
-        }
-
-        $cat_name;
-
-        //Kiem tra name da co hay chua, co bi trung khong
-        if($request->name == $list[0]['name']){
-            return response()->json([
-                'message' => 'The name has been exits!!!',
-            ]);
-        }else{
-            $cat_name = $request->name;
-        }
-
-        $category->update([
-        $category->name = $cat_name,
-        // $category->image = $request->get('image');
-        ]);
-
-
-        $category->save();
-        return response()->json([
-            'message' => 'category updated!',
-            'category' => $category
-        ]);
-
-      }
-
-        return response()->json([
-            'message' => 'category not found !!!'
-        ]);
-    }
 
 
     /**
@@ -175,7 +208,6 @@ class CategoryController extends Controller
             $category->delete();
             return response()->json([
                 'message' => 'categories deleted successfully !!!',
-                'item' => $category
             ]);
         }
         return response()->json([

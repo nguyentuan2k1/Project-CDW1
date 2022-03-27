@@ -11,7 +11,6 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
         phone: "",
         address: "",
     });
-    
     //Call API logout
     const doLogout = () => {
         Swal.fire({
@@ -49,7 +48,7 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
 
     //Display Admin btn change
     const displayAdminRole = () => {
-        if (role.roleUser === "admin")
+        // if (role.roleUser === "admin")
             return (
                 <Button
                     color="outline-primary"
@@ -58,8 +57,8 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
                 >
                     Go Admin
                 </Button>
-            );  
-    };
+            // );  
+            )};
 
     //Handle change state to go Admin page
     const handleAdminChange = (e) => {  
@@ -74,6 +73,7 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
                 const result = await axios("http://localhost:8000/api/info/", {
                     headers: { Authorization: `Bearer ${tokenStr}` },
                 });
+                role.roleUser = result.data.role
                 setInfoData({
                     ...result.data,
                 });
@@ -240,7 +240,7 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
                 >
                     Update
                 </Button>
-                {displayAdminRole()}
+                {checkadmin(role.roleUser) && displayAdminRole()}
                 <Button
                     color="outline-danger"
                     className="btn-md btn-block mt-2"
@@ -252,4 +252,10 @@ export default function Info({ setInfoUser, setIsLogin, role, setRoleChange }) {
             </AvForm>
         </div>
     );
+}
+function checkadmin(role){
+    if(role != 'admin'){
+        return false;
+    }
+    return true;
 }

@@ -24,7 +24,7 @@ class checkadmin
             return redirect('login');
         }
         $user = Auth::user();
-        if($user->isAdmin())
+        if($user->type === 1)
         {
             return $next($request);
         }

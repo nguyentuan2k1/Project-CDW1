@@ -26,8 +26,11 @@ export default function CreateCategories(props) {
         const expenseObject = {
             ...category,
         };
+        let tokenStr = localStorage.getItem("loginToken");
         axios
-            .post("http://localhost:8000/api/category/", expenseObject)
+            .post("http://localhost:8000/api/category/", expenseObject,{
+                headers: { Authorization: `Bearer ${tokenStr}` }
+            })
             .then((res) => {
                 Swal.fire(
                     "Good job!",
