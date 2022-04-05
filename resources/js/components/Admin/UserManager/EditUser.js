@@ -8,7 +8,7 @@ import "../../../../css/EditExpense.css";
 
 export default function EditUser(props) {
     const [user, setUser] = useState({
-        Username: "",
+        // Username: "",
         email: "",
         phone: "",
         password: "",
@@ -18,9 +18,10 @@ export default function EditUser(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios.get(
-                "http://localhost:8000/api/user/" + props.match.params.id
-            );
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios( "http://localhost:8000/api/user/" + props.match.params.id,{
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             const { data } = await result;
             setUser(data.users);
         };
@@ -33,6 +34,8 @@ export default function EditUser(props) {
             ...user,
             [name]: value,
         }));
+        
+        
     };
 
     const handleOnValid = (event, value) => {
@@ -48,11 +51,14 @@ export default function EditUser(props) {
             denyButtonText: `Don't save`,
         }).then((result) => {
             if (result.isConfirmed) {
+                let tokenStr = localStorage.getItem("loginToken");
                 axios
                     .patch(
                         "http://localhost:8000/api/user/" +
                             props.match.params.id,
-                        expenseObject
+                        expenseObject,{
+                            headers: { Authorization: `Bearer ${tokenStr}` },
+                        }
                     )
                     .catch((error) => {
                         Swal.fire({
@@ -125,20 +131,7 @@ export default function EditUser(props) {
                         },
                     }}
                 />
-                <AvField
-                    name="Username"
-                    label="Username"
-                    type="text"
-                    placeholder="User Name..."
-                    value={user.Username}
-                    onChange={handleChange}
-                    validate={{
-                        required: {
-                            value: true,
-                            errorMessage: "Please enter user name",
-                        },
-                    }}
-                />
+               
                 <AvField
                     name="email"
                     label="email"
@@ -174,12 +167,7 @@ export default function EditUser(props) {
                     placeholder="Enter Password..."
                     value={user.password}
                     onChange={handleChange}
-                    validate={{
-                        required: {
-                            value: true,
-                            errorMessage: "Please enter Password!!",
-                        },
-                    }}
+                   
                 />
                 <AvField
                     name="type"
@@ -189,8 +177,7 @@ export default function EditUser(props) {
                     onChange={handleChange}
                 >
                     <option value="1">Admin</option>
-                    <option value="2">User</option>
-                    <option value="3">Other</option>
+                    <option value="0">User</option>
                 </AvField>
                 <AvField
                     name="address"

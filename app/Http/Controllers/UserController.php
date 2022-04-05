@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\order;
 use App\Models\review;
 use App\Models\User;
@@ -15,17 +16,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Foundation\Http\FormRequest;
+
 use App\Models\OauthAccessToken;
-use Laravel\Passport\Passport;
-use Laravel\Passport\PersonalAccessTokenFactory;
-use Laravel\Passport\RefreshToken;
-use Laravel\Passport\RefreshTokenRepository;
+use Illuminate\Validation\Rule;
 use Laravel\Passport\Token;
-use Laravel\Passport\Client as OClient;
-use GuzzleHttp\Client;
-use Laravel\Passport\TokenRepository;
+
 
 
 
@@ -222,7 +217,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = users::all()->toArray();
+        $users = users::where('type','!=','1')->get()->toArray();
         $return = [];
         foreach ($users as $item) {
             $item['id'] = $this->Xulyid($item['id']);
@@ -290,7 +285,7 @@ class UserController extends Controller
     public function show(Request $request, $id)
     {
         $user_id = $this->DichId($id);
-        $user = users::find($user_id);
+        $user = users::find($user_id)->makeHidden(['Username', 'password']);
         if ($user) {
             return response()->json([
                 'message' => 'user found!',
@@ -321,93 +316,42 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $list = users::all()->toArray();
-        $return = [];
-        foreach ($list as $item) {
-            $item['id'] = $this->Xulyid($item['id']);
-            $return[] = $item;
+        $idpr = $this->DichId($id);
+        $type = array('0','1');
+        $validator = Validator::make($request->all(), [
+                'password' => 'nullable',
+                'email' => ['required','email',Rule::unique('users')->ignore($idpr)],
+                'phone' => ['required',Rule::unique('users')->ignore($idpr)],
+                'type'=> ['required',Rule::in($type)],
+            ]);
+        if ($validator->fails()){
+            return  response()->json($validator->errors(),400);
+        }
+        if ($request->phone[0] != '0') {
+            return  response(['error' => 'Phone always start with 0'],400);
+        }
+        if (strlen($request->phone)!= 10) {
+            return  response(['error' => 'Phone always 10 number'],400);
+        }
+        $check = $request->phone;
+        for ($i = 0; $i < strlen($check); $i++) {
+            if (ord($check[$i]) < 48 || ord($check[$i]) > 57) {
+                return  response(['error' => 'Please type is number in phone'],400);
+            }
         }
 
-        $user_id = $this->DichId($id);
-        $user = users::find($user_id);
-
-        if ($user) {
-
-
-            $validator = Validator::make($request->all(), [
-                'Username' => 'required|min:6|',
-                'password' => 'required|min:6|max:12',
-                'email' => 'required|email|',
-                'phone' => 'required|digits:10|',
-            ]);
-
-            if ($validator->fails()) {
-                return response(['errors' => $validator->errors()->all()], 422);
+        $user = User::find($idpr);
+        if (strlen($validator->validated()['password'])>0){
+            if (strlen($validator->validated()['password'])>6 || strlen($validator->validated()['password'])<=12)
+            {
+                $user->password = Hash::make($validator->validated()['password']);
             }
-
-            $Username;
-            $email;
-            $phone;
-            $type;
-
-
-            if ($user['email'] != $request->old_email) {
-                return response(['message' => 'Update failed']);
-            }
-
-            if ($request->type == null) {
-                $type = 0;
-            } else {
-                $type = $request->type;
-            }
-
-            //Kiem tra username da co hay chua, co bi trung khong
-            if ($request->Username == $list[0]['Username']) {
-                return response()->json([
-                    'message' => 'The username has been exits!!!',
-                ]);
-            } else {
-                $Username = $request->Username;
-            }
-
-            //Kiem tra email da co hay chua, co bi trung khong
-            if ($request->email == $list[0]['email']) {
-                return response()->json([
-                    'message' => 'The email has been exits!!!',
-                ]);
-            } else {
-                $email = $request->email;
-            }
-
-            //Kiem tra phone da co hay chua, co bi trung khong
-            if ($request->phone == $list[0]['phone']) {
-                return response()->json([
-                    'message' => 'The phone has been exits!!!',
-                ]);
-            } else {
-                $phone = $request->phone;
-            }
-
-
-
-            $user->update([
-                $user->Username = $Username,
-                $user->email = $email,
-                $user->phone = $request->get('phone'),
-                $user->password = Hash::make($request['password']),
-                $user->type = $type,
-                $user->address = $request->get('address')
-            ]);
-            $user->save();
-            return response()->json([
-                'message' => 'user updated!',
-                'user' => $user
-            ]);
         }
-
-        return response()->json([
-            'message' => 'user not found!'
-        ]);
+        $user->phone = $validator->validated()['phone'];
+        $user->email = $validator->validated()['email'];
+        $user->type = $request->type;
+        $user->address = $request->address;
+        $user->save();
     }
 
     /**

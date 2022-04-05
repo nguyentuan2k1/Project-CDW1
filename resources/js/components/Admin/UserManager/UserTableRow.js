@@ -22,8 +22,11 @@ export default function UserTableRow(props) {
             confirmButtonText: "Yes, delete it!",
         }).then((result) => {
             if (result.isConfirmed) {
+                let tokenStr = localStorage.getItem("loginToken");
                 axios
-                    .delete("http://localhost:8000/api/user/" + props.obj.id)
+                    .delete("http://localhost:8000/api/user/" + props.obj.id,{
+                        headers: { Authorization: `Bearer ${tokenStr}` },
+                    })
                     .then((res) => {
                         Swal.fire(
                             "Good job!",
@@ -43,11 +46,13 @@ export default function UserTableRow(props) {
     };
 
     return (
+        
         <tr>
+            {console.log(props.obj)}
             <td>{props.obj.Username}</td>
             <td>{props.obj.email}</td>
             <td>{props.obj.phone}</td>
-            <td>{props.obj.Type}</td>
+            <td>User</td>
             <td>  {subAddress(props.obj.address)}</td>
             <td>
                 <Link

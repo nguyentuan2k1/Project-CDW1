@@ -29,8 +29,11 @@ export default function CreateUser(props) {
         const expenseObject = {
             ...user,
         };
+        let tokenStr = localStorage.getItem("loginToken");
         axios
-            .post("http://localhost:8000/api/user/", expenseObject)
+            .post("http://localhost:8000/api/user/", expenseObject,{
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            })
             .then((res) => {
                 Swal.fire("Good job!", "Expense Added Successfully", "success")
                     .then(() => {

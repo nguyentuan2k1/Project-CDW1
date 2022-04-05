@@ -8,7 +8,10 @@ export default function UserList(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await axios("http://localhost:8000/api/user/");   
+            let tokenStr = localStorage.getItem("loginToken");
+            const result = await axios("http://localhost:8000/api/user/",{
+                headers: { Authorization: `Bearer ${tokenStr}` },
+            });
             setUser(result.data);
         };
         fetchData();
